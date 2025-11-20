@@ -1,0 +1,537 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des aliments{% endblock %}
+
+{% block body %}
+    <!-- Conteneur principal -->
+    <div class="page-container">
+        <div class="content-wrapper">
+
+            <!-- En-tête de page -->
+            <header class="page-header">
+                <h1>Explorez Votre Nourriture</h1>
+                <p>Repas du monde et détails nutritionnels</p>
+            </header>
+
+            <!-- BARRE DE RECHERCHE -->
+            <!-- Le formulaire envoie la requête à la même route foods_list avec le paramètre ?search=... -->
+            <form action="{{ path('foods_list') }}" method="GET" class="search-form">
+                <input
+                        type="search"
+                        name="search"
+                        placeholder="Rechercher une recette (ex: pizza, chicken, beef)..."
+                        value="{{ currentSearch is defined and currentSearch != 'chicken' ? currentSearch : '' }}"
+                        class="search-input"
+                >
+                <button type="submit" class="search-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </form>
+            <!-- FIN BARRE DE RECHERCHE -->
+
+            <!-- Section 1: TheMealDB -->
+            <section class="section">
+                <h2 class="section-title meal-title">
+                    <span class="icon">🍽</span> Repas depuis TheMealDB
+                </h2>
+                <div class="meal-grid">
+                    {% for meal in meals %}
+                        <!-- Carte d'aliment -->
+                        <div class="card meal-card">
+                            <!-- Image avec effet de zoom au survol -->
+                            <div class="card-image-wrapper">
+                                <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="card-image">
+                            </div>
+
+                            <!-- Contenu de la carte -->
+                            <div class="card-content">
+                                <h3 class="card-title">{{ meal.strMeal }}</h3>
+                                <p class="card-subtitle">
+                                    <span class="highlight">{{ meal.strArea }}</span> - {{ meal.strCategory }}
+                                </p>
+
+                                <!-- Bouton/Lien stylisé -->
+                                <a href="{{ meal.strSource ?: '#' }}" target="_blank" class="button modern-button">
+                                    Voir la recette
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="no-results">
+                            {% if currentSearch is defined %}
+                                Aucun repas trouvé pour "{{ currentSearch }}".
+                            {% else %}
+                                Aucun repas trouvé. Essayez une autre recherche.
+                            {% endif %}
+                        </p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Section 2: OpenFoodFacts -->
+            <section class="section">
+                <h2 class="section-title food-title">
+                    <span class="icon">🥗</span> Produit depuis OpenFoodFacts
+                </h2>
+
+                {% if food.status == 1 and food.product %}
+                    <div class="product-detail-card">
+
+                        <!-- Bloc Image et Code Barre -->
+                        <div class="product-media-block">
+                            <!-- Image du Produit -->
+                            <img src="{{ food.product.image_front_small_url }}"
+                                 alt="{{ food.product.product_name }}"
+                                 class="product-image">
+
+                            <!-- Statut (Nutri-Score, si disponible) -->
+                            {% if food.product.nutriscore_grade %}
+                                <div class="nutri-score nutri-score-{{ food.product.nutriscore_grade }}">
+                                    Nutri-Score {{ food.product.nutriscore_grade|upper }}
+                                </div>
+                            {% endif %}
+
+                            <p class="barcode-text">Code barre : {{ food.code }}</p>
+                        </div>
+
+                        <!-- Bloc Détails -->
+                        <div class="product-details-block">
+                            <h3 class="product-name">{{ food.product.product_name }}</h3>
+
+                            <!-- Marques & Catégories -->
+                            <div class="tags-container">
+                                <span class="tag tag-brand">
+                                    {{ food.product.brands }}
+                                </span>
+                                <span class="tag tag-category">
+                                    {{ food.product.categories }}
+                                </span>
+                            </div>
+
+                            <!-- Résumé (si disponible) -->
+                            {% if food.product.ingredients_text %}
+                                <p class="product-summary">
+                                    "{{ food.product.ingredients_text|slice(0, 150) }}..."
+                                </p>
+                            {% endif %}
+
+                            <!-- Lien OpenFoodFacts -->
+                            <a href="https://fr.openfoodfacts.org/produit/{{ food.code }}" target="_blank" class="link-detail">
+                                Voir la fiche complète sur OpenFoodFacts
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="product-not-found">
+                        <p>Produit non trouvé ou code barre invalide.</p>
+                    </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </div>
+
+    <!-- STYLES CSS COMPLETS POUR LA PAGE -->
+    <style>
+        /* Variables de couleur */
+        :root {
+            --color-bg-light: #f9fafb;
+            --color-bg-dark: #1f2937;
+            --color-text-dark: #111827;
+            --color-text-light: #f3f4f6;
+            --color-primary-indigo: #4f46e5;
+            --color-primary-purple: #9333ea;
+            --color-secondary-pink: #ec4899;
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        /* --- Global / Page structure --- */
+        .page-container {
+            min-height: 100vh;
+            background-color: var(--color-bg-light);
+            padding: 4rem 1rem; /* py-16 px-4 */
+            font-family: Arial, sans-serif;
+            color: var(--color-text-dark);
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .content-wrapper {
+            max-width: 1280px; /* max-w-7xl */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6rem; /* space-y-24 */
+        }
+
+        /* --- En-tête --- */
+        .page-header {
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            font-size: 1.25rem;
+            color: var(--color-primary-indigo);
+            font-weight: 500;
+        }
+
+        /* --- BARRE DE RECHERCHE CSS --- */
+        .search-form {
+            max-width: 30rem; /* Largeur max */
+            margin: 0 auto 4rem auto; /* Centrage et marge inférieure */
+            display: flex;
+            box-shadow: var(--shadow-xl);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background-color: white;
+            border: 2px solid #e0e7ff;
+            transition: border-color 0.3s;
+        }
+
+        .search-form:focus-within {
+            border-color: var(--color-primary-indigo);
+        }
+
+        .search-input {
+            flex-grow: 1;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            outline: none;
+            color: var(--color-text-dark);
+            transition: background-color 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-button {
+            background-color: var(--color-primary-indigo);
+            color: white;
+            padding: 0 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-button:hover {
+            background-color: #4338ca;
+        }
+
+        .search-button:active {
+            transform: scale(0.98);
+        }
+        /* --- FIN BARRE DE RECHERCHE CSS --- */
+
+
+        /* --- Sections --- */
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 2.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section-title .icon {
+            color: var(--color-primary-indigo);
+            margin-right: 0.5rem;
+        }
+
+        .food-title .icon {
+            color: var(--color-secondary-pink);
+        }
+
+        /* --- Grille des repas (TheMealDB) --- */
+        .meal-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 2rem;
+        }
+
+        @media (min-width: 640px) {
+            .meal-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .meal-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .meal-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* --- Carte (Card) --- */
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid #f3f4f6;
+            transition: transform 0.5s, box-shadow 0.5s, border-color 0.5s;
+        }
+
+        .meal-card:hover {
+            transform: scale(1.03);
+            box-shadow: var(--shadow-xl);
+            border-color: #a5b4fc;
+        }
+
+        .card-image-wrapper {
+            height: 12rem; /* h-48 */
+            overflow: hidden;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .meal-card:hover .card-image {
+            transform: scale(1.1);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .card-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .highlight {
+            font-weight: 600;
+            color: var(--color-primary-indigo);
+        }
+
+        /* --- Nouveau Style de Bouton Moderne --- */
+        .modern-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem; /* Rendre le bouton légèrement plus grand */
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            /* Dégradé de couleur moderne */
+            background-image: linear-gradient(45deg, var(--color-primary-indigo) 0%, var(--color-primary-purple) 100%);
+            border-radius: 0.75rem; /* Coins plus arrondis */
+            box-shadow: 0 8px 15px -3px rgba(79, 70, 229, 0.4); /* Ombre colorée */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animation fluide */
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .modern-button:hover {
+            background-image: linear-gradient(45deg, #6366f1 0%, #a855f7 100%); /* Dégradé légèrement plus clair au survol */
+            transform: translateY(-4px) scale(1.02); /* Soulèvement et légère mise à l'échelle */
+            box-shadow: 0 12px 20px -5px rgba(147, 51, 234, 0.5); /* Ombre plus intense */
+        }
+
+        .modern-button svg {
+            margin-left: 0.5rem;
+            transition: transform 0.3s;
+        }
+
+        .modern-button:hover svg {
+            transform: translateX(3px); /* Flèche qui se déplace */
+        }
+        /* --- FIN Nouveau Style de Bouton Moderne --- */
+
+        /* Suppression de l'ancien primary-button */
+        .primary-button { display: none; }
+
+
+        /* --- Carte de détail produit (OpenFoodFacts) --- */
+        .product-detail-card {
+            max-width: 48rem; /* max-w-3xl */
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); /* shadow-2xl */
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            border: 1px solid #f3f4f6;
+        }
+
+        @media (min-width: 768px) {
+            .product-detail-card {
+                padding: 2.5rem;
+            }
+        }
+
+        .product-media-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            flex: 0 0 33.333333%; /* md:w-1/3 */
+        }
+
+        .product-image {
+            width: 10rem;
+            height: 10rem;
+            object-fit: cover;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+            border: 4px solid #e0e7ff;
+            transition: transform 0.5s;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+        .nutri-score {
+            padding: 0.5rem 1rem;
+            font-weight: 800;
+            color: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .nutri-score-a { background-color: #008b4c; }
+        .nutri-score-b { background-color: #8ccf00; }
+        .nutri-score-c { background-color: #ffcc00; }
+        .nutri-score-d { background-color: #ff9900; }
+        .nutri-score-e { background-color: #e63234; }
+
+
+        .barcode-text {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            padding-top: 0.5rem;
+        }
+
+        .product-details-block {
+            flex: 1; /* md:w-2/3 */
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .product-details-block {
+                text-align: left;
+            }
+        }
+
+        .product-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .tags-container {
+                justify-content: flex-start;
+            }
+        }
+
+        .tag {
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            box-shadow: var(--shadow-md);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tag-brand {
+            background-color: #eef2ff;
+            color: #3730a3;
+        }
+
+        .tag-category {
+            background-color: #fce7f6;
+            color: #be185d;
+        }
+
+        .product-summary {
+            color: #4b5563;
+            font-size: 1rem;
+            font-style: italic;
+            padding-top: 0.5rem;
+        }
+
+        .link-detail {
+            color: var(--color-secondary-pink);
+            font-weight: 600;
+            transition: color 0.2s;
+            text-decoration: none;
+            margin-top: 0.75rem;
+            display: inline-block;
+        }
+
+        .link-detail:hover {
+            color: #9d174d;
+        }
+
+        .product-not-found {
+            max-width: 48rem;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid #ef4444;
+        }
+
+        .product-not-found p {
+            text-align: center;
+            color: #4b5563;
+            font-weight: 500;
+        }
+    </style>
+{% endblock %}

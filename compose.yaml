@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: create_your_food_db
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: 'Junior(2004)'
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  adminer:
+    image: adminer
+    container_name: create_your_food_adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - database
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: create_your_food_php
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - database
+
+  nginx:
+    image: nginx:1.23-alpine
+    container_name: create_your_food_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+
+volumes:
+  database_data:
