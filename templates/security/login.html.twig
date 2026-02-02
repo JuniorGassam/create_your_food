@@ -3,80 +3,199 @@
 {% block title %}Connexion{% endblock %}
 
 {% block body %}
-    <!-- Container principal -->
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-gradient-x px-4">
 
-        <!-- Formulaire -->
-        <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-10 space-y-6 transform transition duration-500 hover:scale-105">
+    <style>
 
-            <!-- Titre -->
-            <div class="text-center">
-                <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Bienvenue</h1>
-                <p class="mt-2 text-gray-500">Connectez-vous pour continuer</p>
-            </div>
+        /* --- PAGE BACKGROUND --- */
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #eef2f3, #dfe9f3);
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+        }
 
-            <!-- Message d'erreur -->
+        /* --- CARD --- */
+        .login-card {
+            background: #ffffff;
+            padding: 40px 35px;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Smooth fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- TITLES --- */
+        .login-title {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        /* --- INPUTS --- */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .input-group input {
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .input-group input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+            outline: none;
+        }
+
+        /* --- PRIMARY BUTTON --- */
+        .btn-primary-modern {
+            width: 100%;
+            padding: 14px;
+            background: #0d6efd;
+            color: white;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 5px;
+        }
+
+        .btn-primary-modern:hover {
+            background: #0b5ed7;
+        }
+
+        /* --- ERROR MESSAGE --- */
+        .alert-error {
+            background: #ffe5e5;
+            padding: 12px;
+            border-radius: 10px;
+            color: #b60000;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* --- SEPARATOR --- */
+        .separator {
+            text-align: center;
+            position: relative;
+            margin: 25px 0;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: "";
+            height: 1px;
+            width: 40%;
+            background: #ddd;
+            position: absolute;
+            top: 50%;
+        }
+
+        .separator::before { left: 0; }
+        .separator::after { right: 0; }
+
+        .separator span {
+            font-size: 0.85rem;
+            color: #666;
+            padding: 0 10px;
+            background: white;
+        }
+
+        /* --- GOOGLE BUTTON --- */
+        .btn-google {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #dd4b39;
+            color: #dd4b39;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+            gap: 8px;
+        }
+
+        .btn-google:hover {
+            background: #dd4b39;
+            color: white;
+        }
+
+    </style>
+
+    <div class="login-page">
+
+        <div class="login-card">
+
+            <h2 class="login-title">Connexion</h2>
+            <p class="login-subtitle">Accédez à votre espace personnel</p>
+
             {% if error %}
-                <div class="flex items-center gap-2 p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                    <svg class="w-5 h-5 flex-shrink-0 text-red-700" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10A8 8 0 1110 2a8 8 0 018 8zm-8-4a1 1 0 00-1 1v3a1 1 0 102 0V7a1 1 0 00-1-1zm0 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd"/>
-                    </svg>
+                <div class="alert-error">
                     {{ error.messageKey|trans(error.messageData, 'security') }}
                 </div>
             {% endif %}
 
-            <!-- Formulaire de connexion -->
-            <form method="post" action="{{ path('app_login') }}" class="space-y-5">
+            <form method="post">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                <!-- Email / Nom d'utilisateur -->
-                <div class="relative">
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Email ou Nom d'utilisateur</label>
-                    <input type="text"
-                           value="{{ last_username }}"
-                           name="_username"
-                           id="username"
-                           placeholder="Votre email"
-                           class="peer block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
-                           required autofocus autocomplete="email">
+                <div class="input-group">
+                    <label for="inputEmail">Email</label>
+                    <input type="email" id="inputEmail" name="email" value="{{ last_username }}" required>
                 </div>
 
-                <!-- Mot de passe -->
-                <div class="relative">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-                    <input type="password"
-                           name="_password"
-                           id="password"
-                           placeholder="Votre mot de passe"
-                           class="peer block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200"
-                           required autocomplete="current-password">
+                <div class="input-group">
+                    <label for="inputPassword">Mot de passe</label>
+                    <input type="password" id="inputPassword" name="password" required>
                 </div>
 
-                <!-- Bouton -->
-                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 transform hover:scale-105">
-                    Connexion
+                <button class="btn-primary-modern" type="submit">
+                    Se connecter
                 </button>
-
-                <!-- Lien secondaire -->
-                <p class="text-center text-sm text-gray-500 mt-2">
-                    Pas encore de compte ?
-                    <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium transition duration-200">Inscrivez-vous</a>
-                </p>
             </form>
+
+            <div class="separator">
+                <span>OU</span>
+            </div>
+
+            <a href="{{ path('connect_google_start') }}" class="btn-google">
+                <i class="fab fa-google"></i> Se connecter avec Google
+            </a>
+
         </div>
+
     </div>
 
-    <!-- Animations CSS -->
-    <style>
-        /* Dégradé animé pour le background */
-        @keyframes gradient-x {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .animate-gradient-x {
-            background-size: 200% 200%;
-            animation: gradient-x 10s ease infinite;
-        }
-    </style>
 {% endblock %}
