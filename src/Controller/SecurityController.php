@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -29,8 +30,9 @@ class SecurityController extends AbstractController
      * Il n'y a pas besoin d'implémentation de code ici.
      */
     #[Route(path: '/logout', name: 'app_logout')]
-    public function logout(): void
+    public function logout(): Response
     {
-        throw new \LogicException('Cette méthode peut être vide - elle sera interceptée par le pare-feu.');
+        return $this->render('security/login.html.twig', [
+        ]);
     }
 }
