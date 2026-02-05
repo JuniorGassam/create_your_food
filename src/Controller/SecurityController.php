@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,5 +35,29 @@ class SecurityController extends AbstractController
     {
         return $this->render('security/login.html.twig', [
         ]);
+    }
+
+    /**
+     * Route pour initier la connexion avec Google
+     */
+    #[Route('/connect/google', name: 'connect_google')]
+    public function connectGoogle(ClientRegistry $clientRegistry): RedirectResponse
+    {
+        return $clientRegistry
+            ->getClient('google')
+            ->redirect(
+                ['email', 'profile'], // Les scopes que vous demandez à Google
+                []
+            );
+    }
+
+    /**
+     * Route de callback Google (gérée par GoogleAuthenticator)
+     */
+    #[Route('/connect/google/check', name: 'connect_google_check')]
+    public function connectGoogleCheck(): Response
+    {
+        // Si vous arrivez ici, vous êtes authentifié!
+        return $this->redirectToRoute('foods_list');
     }
 }
