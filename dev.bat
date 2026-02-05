@@ -15,7 +15,7 @@ if errorlevel 1 (
 )
 
 echo 📥 Synchronisation du code...
-git pull origin develop
+git pull
 
 if errorlevel 1 (
     echo ❌ Erreur lors du git pull
