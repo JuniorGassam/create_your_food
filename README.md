@@ -6,14 +6,35 @@ Une plateforme web innovante permettant de **rechercher des recettes** et **cons
 
 ## 📋 Table des Matières
 
+- [Quick Start](#-quick-start)
 - [Fonctionnalités](#-fonctionnalités)
 - [Stack Technique](#-stack-technique)
 - [Prérequis](#-prérequis)
 - [Installation](#-installation)
 - [Utilisation](#-utilisation)
+- [Commandes Utiles](#-commandes-utiles)
+- [Debugging et Xdebug](#-debugging-et-xdebug)
 - [Architecture](#-architecture)
 - [Contribution](#-contribution)
 - [Licence](#-licence)
+
+---
+
+## 🚀 Quick Start
+
+### Windows (Recommandé)
+```batch
+# Double-clique sur dev.bat ou
+dev.bat
+```
+
+### macOS / Linux
+```bash
+git pull origin develop
+docker compose up -d --build
+```
+
+**Puis accède à:** http://localhost:8080
 
 ---
 
@@ -127,40 +148,59 @@ docker compose up -d
 
 #### Accéder à l'application
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Application** | http://localhost:8080 | Interface web principale |
-| **Adminer** | http://localhost:8081 | Interface de gestion de la BD |
-| **Mailpit** | http://localhost:8025 | Interface d'émulation email (si activé) |
+### 🌐 Accès aux Services
 
-#### Tester les APIs
+| Service | URL | Identifiants |
+|---------|-----|--------------|
+| **Application** | http://localhost:8080 | - |
+| **Adminer** | http://localhost:8081 | postgres / app / Junior(2004) |
+| **Mailpit** | http://localhost:8025 | - (si activé) |
 
-```bash
-# Recherche de plats
-curl "http://localhost:8080/foods?search=chicken"
+---
 
-# Voir les logs
-docker compose logs -f php
+## 🔗 Git Hooks - Auto-Correction du Code
 
-# Arrêter l'application
-docker compose down
+Les **git hooks pré-commit** lancent automatiquement l'analyse et la correction du code avant chaque commit. ✨
 
-# Arrêter et nettoyer les volumes
-docker compose down -v
-```
-
-#### Commandes utiles Docker
+### Configuration Automatique
+Les hooks sont installés automatiquement lors de `composer install`. Si tu les as manqués :
 
 ```bash
-# Accéder au shell PHP
-docker compose exec php bash
+# Installer manuellement les hooks
+composer run setup-hooks
 
-# Accéder à la base de données
-docker compose exec database psql -U app -d app
-
-# Exécuter une commande Symfony
-docker compose exec php php bin/console debug:routes
+# Ou sous Windows
+setup-hooks.bat
 ```
+
+### Fonctionnalités
+
+**À chaque `git commit` :**
+1. 🔧 **PHP-CS-Fixer** → Corrige automatiquement le code (indentation, espaces, imports, etc.)
+2. 🔬 **PHPStan** → Analyse statique pour détecter les erreurs
+3. ✅ Commit bloqué si erreurs détectées
+
+### Commandes Manuelles
+
+```bash
+# Corriger le code manuellement
+docker compose exec php composer cs:fix
+
+# Vérifier les erreurs (sans corriger)
+docker compose exec php composer phpstan:check
+
+# Skip les hooks (force commit)
+git commit --no-verify
+```
+
+### Configuration PHPStan
+- **Fichier:** `phpstan.neon`
+- **Niveau:** 5 (max = 9)
+- **Paths:** `src/` seulement
+
+### Configuration PHP-CS-Fixer
+- **Fichier:** `.php-cs-fixer.php`
+- **Rules:** @Symfony + custom
 
 ---
 
@@ -209,6 +249,143 @@ php bin/console doctrine:query:sql "SELECT 1"
 
 ---
 
+## 💻 Commandes Utiles
+
+### 🐳 Docker - Gestion des Conteneurs
+
+```bash
+# Démarrer l'application (migrations auto)
+docker compose up -d --build
+
+# Afficher le statut des services
+docker compose ps
+
+# Afficher les logs
+docker compose logs -f              # Tous les logs
+docker compose logs -f php          # Logs PHP uniquement
+docker compose logs -f database     # Logs base de données
+
+# Arrêter l'application
+docker compose down                 # Arrêter puis nettoyer
+docker compose down -v              # Arrêter et supprimer les volumes
+
+# Redémarrer un service spécifique
+docker compose restart php
+```
+
+### 🔧 Commandes Symfony (Dans Docker)
+
+```bash
+# Accéder au shell PHP
+docker compose exec php bash
+
+# Exécuter les migrations
+docker compose exec php php bin/console doctrine:migrations:migrate -n
+
+# Vider le cache
+docker compose exec php php bin/console cache:clear
+
+# Voir les routes disponibles
+docker compose exec php php bin/console debug:routes
+
+# Informations debug
+docker compose exec php php bin/console debug:container
+```
+
+### 🗄️ Base de Données
+
+```bash
+# Accéder à PostgreSQL depuis le container
+docker compose exec database psql -U app -d app
+
+# Commandes utiles PostgreSQL
+\dt                          # Lister les tables
+SELECT * FROM "user";        # Voir les utilisateurs
+\q                           # Quitter psql
+
+# Accéder à Adminer (GUI)
+# http://localhost:8081
+```
+
+### 🌐 Accès aux Services
+
+| Service | URL | Identifiants |
+|---------|-----|--------------|
+| **Application** | http://localhost:8080 | - |
+| **Adminer** | http://localhost:8081 | postgres / app / Junior(2004) |
+| **Mailpit** | http://localhost:8025 | - (si activé) |
+
+---
+
+## 🐛 Debugging et Xdebug
+
+### Configuration Xdebug (Automatique ✅)
+
+Xdebug est **déjà configuré** dans le Dockerfile. Aucune installation supplémentaire requise !
+
+### Debugger du Code PHP dans VS Code
+
+#### 1️⃣ Installer l'extension PHP Debug
+```
+Nom: PHP Debug
+ID: felixbecker.php-debug
+```
+
+#### 2️⃣ Configuration (déjà faite)
+Le fichier `.vscode/launch.json` est pré-configuré pour :
+- **Host:** localhost
+- **Port:** 9003
+- **Path Mapping:** `/var/www/html` → Votre dossier local
+
+#### 3️⃣ Utiliser le Debugger
+
+**Méthode 1: Breakpoints interactifs**
+```php
+// Dans votre code (ex: src/Controller/FoodController.php)
+public function index()
+{
+    $name = "John";
+    // Ajouter un breakpoint (F9) à la ligne suivante
+    dd($name); // <-- F9 ici
+    
+    return $this->render(...);
+}
+```
+
+1. Appuyer sur **F9** pour ajouter un breakpoint (point rouge)
+2. Cliquer sur **"Run and Debug"** dans VS Code (Ctrl+Shift+D)
+3. Sélectionner **"Listen for Xdebug"**
+4. Visiter http://localhost:8080 dans votre navigateur
+
+**Méthode 2: Accepter les requêtes debug**
+
+Ajouter `?XDEBUG_SESSION_START=1` à l'URL :
+```
+http://localhost:8080/foods?XDEBUG_SESSION_START=1
+```
+
+#### 4️⃣ Fonctionnalités du Debugger
+- ⏸️ **Pause:** Cliquer sur "Pause" pour interrompre l'exécution
+- **Variables:** Voir les valeurs locales, globales, etc.
+- **Watch:** Surveiller des variables spécifiques
+- **Stack:** Voir l'historique d'exécution
+- **Console:** Exécuter du PHP en direct
+
+### Troubleshooting Xdebug
+
+```bash
+# Vérifier que Xdebug est bien chargé
+docker compose exec php php -m | grep xdebug
+
+# Voir la config de Xdebug
+docker compose exec php php -i | grep -A 20 xdebug
+
+# Ramet le container
+docker compose restart php
+```
+
+---
+
 ## 🏗️ Architecture
 
 ### Structure du Projet
@@ -235,11 +412,15 @@ create_your_food/
 ├── migrations/               # Migrations Doctrine
 ├── tests/                    # Tests unitaires et fonctionnels
 ├── docker/
+│   ├── entrypoint.sh         # Script de démarrage (migrations auto)
 │   └── nginx/
 │       └── default.conf      # Configuration Nginx
+├── .vscode/
+│   └── launch.json           # Configuration Xdebug pour VS Code
 ├── compose.yaml              # Docker Compose (PostgreSQL)
 ├── compose.override.yaml     # Surcharge dev (Mailpit)
 ├── Dockerfile                # Image PHP
+├── dev.bat                   # Script de démarrage rapide (Windows)
 ├── .env                      # Variables d'environnement (Docker)
 ├── .env.local                # Variables locales (ignoré Git)
 └── composer.json             # Dépendances PHP
