@@ -1,0 +1,21 @@
+includes:
+  - phpstan-baseline.neon
+
+parameters:
+  level: 5
+  paths:
+    - src/
+  
+  excludePaths:
+    - var/
+    - vendor/
+
+  # Configuration Symfony
+  symfony:
+    container_xml_path: var/cache/dev/App_KernelDevDebugContainer.xml
+  
+  # Extensions
+  ignoreErrors:
+    # Ajouter les faux positifs ici si nécessaire
+    - identifier: argument.type
+    - identifier: return.type
