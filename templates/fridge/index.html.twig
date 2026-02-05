@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="max-w-6xl mx-auto py-12 px-4">
+        <div class="mb-12">
+            <h1 class="text-4xl font-black text-slate-900 dark:text-white">Frigo Magique 🥗</h1>
+            <p class="text-slate-500 mt-2 font-medium text-lg">Entrez vos ingrédients, nous trouvons les recettes qui les contiennent **tous**.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-slate-100 dark:border-slate-800">
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-4 tracking-widest">Ajouter un ingrédient</label>
+                    <div class="space-y-4">
+                        <input type="text" id="ing-input" placeholder="Ex: Chicken, Basil..."
+                               class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white">
+
+                        <div id="tags-container" class="flex flex-wrap gap-2 min-h-[40px]">
+                        </div>
+
+                        <button id="btn-search" class="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-30" disabled>
+                            Lancer la recherche
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3">
+                <div id="results-area" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="col-span-full text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                        <p class="text-slate-400 font-bold uppercase tracking-widest text-sm">Votre plan de travail est vide</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ingredients = [];
+
+        const input = document.getElementById('ing-input');
+        const container = document.getElementById('tags-container');
+        const btnSearch = document.getElementById('btn-search');
+        const resultsArea = document.getElementById('results-area');
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== '') {
+                addIngredient(input.value.trim());
+                input.value = '';
+            }
+        });
+
+        function addIngredient(name) {
+            if (!ingredients.includes(name)) {
+                ingredients.push(name);
+                renderTags();
+            }
+        }
+
+        function removeIngredient(name) {
+            ingredients = ingredients.filter(i => i !== name);
+            renderTags();
+        }
+
+        function renderTags() {
+            container.innerHTML = ingredients.map(ing => `
+            <span class="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-2">
+                ${ing}
+                <button onclick="removeIngredient('${ing}')" class="hover:text-rose-500 text-lg">&times;</button>
+            </span>
+        `).join('');
+            btnSearch.disabled = ingredients.length === 0;
+        }
+
+        btnSearch.addEventListener('click', async () => {
+            resultsArea.innerHTML = '<div class="col-span-full text-center py-20 font-bold text-slate-400 animate-pulse">Intersection des saveurs en cours...</div>';
+
+            try {
+                const response = await fetch('{{ path("app_fridge_search") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ingredients: ingredients })
+                });
+                const data = await response.json();
+
+                if (data.meals.length > 0) {
+                    resultsArea.innerHTML = data.meals.map(meal => `
+                    <div class="bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800 group hover:scale-[1.02] transition-transform">
+                        <img src="${meal.strMealThumb}" class="w-full h-40 object-cover">
+                        <div class="p-5">
+                            <h3 class="font-black text-slate-800 dark:text-white mb-4 line-clamp-1">${meal.strMeal}</h3>
+                            <a href="/recipe/${meal.idMeal}" class="block text-center py-2 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold text-indigo-600 hover:bg-indigo-600 hover:text-white transition">
+                                Voir la recette
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+                } else {
+                    resultsArea.innerHTML = `<div class="col-span-full text-center py-20 text-rose-500 font-bold">${data.message || 'Aucun plat trouvé.'}</div>`;
+                }
+            } catch (e) {
+                resultsArea.innerHTML = '<div class="col-span-full text-center py-20 text-rose-500">Erreur lors de la recherche.</div>';
+            }
+        });
+    </script>
+{% endblock %}
