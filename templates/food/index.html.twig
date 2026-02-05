@@ -57,7 +57,8 @@
                         <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-6 line-clamp-2 leading-tight">{{ meal.strMeal }}</h3>
 
                         <div class="mt-auto">
-                            <a href="{{ meal.strSource ?: '#' }}" target="_blank" class="flex items-center justify-center w-full py-3 bg-slate-50 dark:bg-slate-800 group-hover:bg-indigo-600 text-slate-700 dark:text-slate-300 group-hover:text-white rounded-xl font-bold text-sm transition-all duration-300">
+
+                            <a href="{{ path('recipe_show', {id: meal.idMeal}) }}" class="flex items-center justify-center w-full py-3 bg-slate-50 dark:bg-slate-800 group-hover:bg-indigo-600 text-slate-700 dark:text-slate-300 group-hover:text-white rounded-xl font-bold text-sm transition-all duration-300">
                                 Voir la recette
                                 <svg class="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                             </a>

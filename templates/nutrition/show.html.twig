@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <div class="max-w-6xl mx-auto py-12 px-4 min-h-screen">
+        <div class="flex flex-col md:flex-row items-center gap-10 mb-16 animate-fade-in">
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-orange-400 to-rose-400 rounded-[3rem] blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <img src="{{ meal.strMealThumb }}" class="relative w-48 h-48 rounded-[2.5rem] object-cover shadow-2xl" alt="">
+            </div>
+            <div class="text-center md:text-left space-y-4">
+                <h1 class="text-5xl font-black tracking-tight text-slate-900 dark:text-white">{{ meal.strMeal }}</h1>
+                <div class="flex flex-wrap justify-center md:justify-start gap-3">
+                    <span class="px-5 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl text-sm font-bold shadow-sm">
+                        🌍 {{ meal.strArea }}
+                    </span>
+                    <span class="px-5 py-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-2xl text-sm font-bold shadow-sm">
+                        🥗 {{ meal.strCategory }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-slate-900 dark:bg-slate-800 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
+                    <p class="text-slate-400 uppercase text-xs font-black tracking-widest mb-2">Calories Estimées</p>
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-400">
+                            {{ nutrition.calories|default('550') }}
+                        </span>
+                        <span class="text-xl font-bold opacity-40">kcal</span>
+                    </div>
+                    <div class="mt-8 pt-8 border-t border-white/10 space-y-4">
+                        <div class="flex justify-between text-sm italic text-slate-400">
+                            <span>Analyse par JuniorJudin'Board</span>
+                            <span>100% Digital</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 flex flex-col h-[650px] bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+                <div class="p-6 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 flex items-center justify-between sticky top-0 z-10">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl flex items-center justify-center shadow-lg text-white">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-black dark:text-white">JuniorJudin'Board</h3>
+                            <span class="text-[10px] text-emerald-500 font-bold uppercase tracking-widest">● Assistant Personnel Expert</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chat-messages" class="flex-1 p-8 overflow-y-auto space-y-6 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth">
+                    <div class="max-w-[90%] flex flex-col gap-2">
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-3xl rounded-tl-none shadow-sm border border-slate-100 dark:border-slate-700 text-sm leading-relaxed dark:text-slate-200">
+                            Bonjour ! Je suis **JuniorJudin'Board**. Je connais parfaitement la recette du plat **{{ meal.strMeal }}**.
+                            Posez-moi vos questions sur les nutriments, les calories ou les allergènes !
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800">
+                    <form id="chat-form" class="relative group">
+                        <input type="text" id="chat-input" placeholder="Posez une question sur ce plat..."
+                               class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-2xl pl-6 pr-16 py-5 text-sm focus:ring-4 focus:ring-indigo-500/10 transition-all dark:text-white outline-none">
+                        <button type="submit" class="absolute right-3 top-3 bottom-3 px-5 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/30 hover:bg-indigo-700 transition active:scale-95">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('chat-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const messages = document.getElementById('chat-messages');
+            const text = input.value.trim();
+            if(!text) return;
+
+            // Afficher message utilisateur
+            messages.innerHTML += `
+            <div class="flex flex-col items-end animate-slide-up">
+                <div class="bg-indigo-600 text-white p-4 px-6 rounded-3xl rounded-tr-none shadow-xl shadow-indigo-600/20 text-sm max-w-[85%] leading-relaxed">
+                    ${text}
+                </div>
+            </div>`;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            // Loader avec le nouveau nom
+            const loaderId = 'loader-' + Date.now();
+            messages.innerHTML += `
+            <div id="${loaderId}" class="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest italic animate-pulse">
+                <div class="flex gap-1">
+                    <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                    <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                    <div class="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                </div>
+                JuniorJudin'Board analyse votre question...
+            </div>`;
+            messages.scrollTop = messages.scrollHeight;
+
+            try {
+                const response = await fetch('{{ path("chat_ask") }}', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: text, mealName: '{{ meal.strMeal|escape("js") }}' })
+                });
+
+                if (!response.ok) throw new Error("Erreur réseau");
+
+                const data = await response.json();
+                document.getElementById(loaderId).remove();
+
+                // Conversion du Markdown de l'IA en HTML propre
+                const formattedResponse = marked.parse(data.response);
+
+                // Affichage de la réponse structurée
+                messages.innerHTML += `
+                <div class="flex flex-col items-start animate-slide-up w-full">
+                    <div class="prose prose-sm dark:prose-invert bg-white dark:bg-slate-800 p-5 rounded-3xl rounded-tl-none shadow-sm border border-slate-100 dark:border-slate-700 text-sm leading-relaxed dark:text-slate-200 max-w-[95%]">
+                        ${formattedResponse}
+                    </div>
+                </div>`;
+            } catch (e) {
+                document.getElementById(loaderId).innerHTML = "<span class='text-red-500'>JuniorJudin'Board : Erreur de connexion. Vérifiez votre clé API ou votre connexion internet.</span>";
+            }
+            messages.scrollTop = messages.scrollHeight;
+        });
+    </script>
+
+    <style>
+        /* Styles pour la structure du texte généré (Markdown) */
+        .prose h3 { color: #4f46e5; font-weight: 800; margin-top: 1rem; }
+        .prose ul { list-style-type: disc; margin-left: 1.2rem; margin-bottom: 1rem; }
+        .prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; border-radius: 1rem; overflow: hidden; }
+        .prose th, .prose td { padding: 8px 12px; border: 1px solid #e2e8f0; text-align: left; }
+        .prose th { background-color: #f8fafc; color: #1e293b; }
+        .dark .prose th { background-color: #1e293b; color: #f8fafc; border-color: #334155; }
+        .dark .prose td { border-color: #334155; }
+
+        @keyframes slide-up {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up { animation: slide-up 0.3s ease-out forwards; }
+        .animate-fade-in { animation: opacity 0.8s ease-out; }
+    </style>
+{% endblock %}

@@ -33,6 +33,11 @@ services:
     depends_on:
       - database
 
+    environment:
+      EDAMAM_ID: "gassamgassamlionel@gmail.com"
+      EDAMAM_KEY: "junior"
+      MISTRAL_KEY: "P2WSEJYWkpk646fKnkRsViudH0zj65wT"
+
   nginx:
     image: nginx:1.23-alpine
     container_name: create_your_food_nginx
