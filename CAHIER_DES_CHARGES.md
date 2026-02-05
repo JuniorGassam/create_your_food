@@ -3,6 +3,7 @@
 ## 1. Résumé Exécutif
 
 **Nom du projet:** Create Your Food  
+**Equipe:** Junior GASSSAM GASSAM et Judin MALIVERT  
 **Type:** Application web intégrant 2 APIs externes  
 **Objectif:** Fournir une plateforme permettant aux utilisateurs de rechercher des plats et consultants leurs informations nutritionnelles
 
@@ -26,6 +27,611 @@ Create Your Food est une application web innovante qui facilite la recherche de 
 ---
 
 ## 3. Analyse SWOT
+
+**Forces (interne)**
+- APIs gratuites et riches (TheMealDB: 1000+ recettes, OpenFoodFacts: millions de produits)
+- Framework Symfony mature et sécurisé
+- Combinaison unique recherche plats + nutrition
+- Chatbot IA pour engagement utilisateur
+- Proposition IA innovante pour création de plats
+
+**Faiblesses (interne)**
+- Dépendance à APIs externes (risque indisponibilité)
+- Données nutritionnelles parfois incomplètes
+- Pas de vérification des données (crowdsourced)
+- Chatbot/IA nécessite expertise spécialisée
+- Cache limité (pas de Redis actuellement)
+
+**Opportunités (externe)**
+- Croissance du marché healthy eating
+- Intégration avec apps fitness (MyFitnessPal, etc.)
+- Expansion internationale (APIs multilingues)
+- Monétisation via premium features
+- Partenariats avec marques alimentaires
+
+**Menaces (externe)**
+- Concurrence d'apps établies (Yummly, Allrecipes)
+- Changements dans les APIs externes
+- Réglementation RGPD stricte
+- Qualité variable des données crowdsourced
+- Coûts d'IA si scaling
+
+---
+
+## 4. Analyse fonctionnelle
+
+### 4.1 Diagramme Bête à Cornes
+
+> *À qui le produit rend-il service ? Sur quoi agit-il ? Dans quel but ?*
+
+```
+    ┌──────────────────────┐                  ┌──────────────────────┐
+    │   Utilisateurs       │                  │  Plats et aliments   │
+    │   curieux de cuisine │                  │  avec données        │
+    │   et nutrition       │                  │  nutritionnelles     │
+    └──────────┬───────────┘                  └───────────┬──────────┘
+               │                                          │
+               │        ┌────────────────────┐            │
+               └───────▸│                    │◂───────────┘
+                        │   Create Your Food │
+                        │       (App Web)    │
+                        └────────┬───────────┘
+                                 │
+                                 ▼
+                  ┌──────────────────────────┐
+                  │  Trouver et créer des    │
+                  │  plats personnalisés     │
+                  │  avec infos nutritionnelles│
+                  └──────────────────────────┘
+```
+
+| Question | Réponse |
+|----------|---------|
+| **À qui rend-il service ?** | Utilisateurs intéressés par la cuisine et la nutrition |
+| **Sur quoi agit-il ?** | Plats, recettes et informations nutritionnelles |
+| **Dans quel but ?** | Faciliter la découverte de recettes et l'accès aux données nutritionnelles |
+
+### 4.2 Diagramme Pieuvre
+
+> *Quelles sont les relations entre le produit et les éléments de son milieu extérieur ?*
+
+```
+  ┌──────────────┐          ┌──────────────┐          ┌──────────────┐
+  │ Utilisateur  │          │  APIs        │          │  Appareil    │
+  │ web/mobile   │          │  externes    │          │  mobile      │
+  └──────┬───────┘          └──────┬───────┘          └──────┬───────┘
+         │                         │                         │
+         │ FP1                     │ FC1                     │ FC2
+         │                         │                         │
+         │    ┌────────────────────┼────────────────────┐    │
+         ├───▸│                                         │◂───┤
+         │    │            Create Your Food              │    │
+    FP2  │    │                 (Symfony)                │    │
+         │    │                                         │    │
+    FP3  ├───▸│                                         │◂───┤
+         │    └──┬──────────┬──────────┬────────────┬───┘    │
+         │       │          │          │            │      FC5
+  ┌──────┴───┐   │ FC3      │ FC4      │ FC6        │
+  │  Chatbot │   │          │          │            │
+  │  IA      │   │          │          │     ┌──────┴───────┐
+  └──────────┘   │          │          │     │  Proposition │
+          ┌──────┴───────┐  │   ┌──────┴──┐  │  IA si pas   │
+          │ Réglementa-   │  │   │ Infra-  │  │  de plat    │
+          │ tion (RGPD)  │  │   │ structure│  └─────────────┘
+          └──────────────┘  │   └─────────┘
+                     ┌──────┴───────┐
+                     │  TheMealDB   │
+                     │  OpenFoodFacts│
+                     └──────────────┘
+```
+
+**Analyse du Diagramme Pieuvre :**
+- **Utilisateur web/mobile** : Point d'entrée principal, utilise l'app via navigateur ou mobile (FP1, FP2, FP3)
+- **APIs externes** : Dépendance critique pour les données (FC1), source de recettes et nutrition
+- **Appareil mobile** : Contraintes techniques pour responsive design et capteurs (FC2)
+- **Chatbot IA** : Fonctionnalité avancée pour engagement utilisateur (FC4)
+- **Proposition IA** : Innovation clé quand les APIs ne trouvent pas de résultats (FC5)
+- **Réglementation (RGPD)** : Contrainte légale obligatoire (FC3)
+- **Infrastructure** : Support technique pour performance et disponibilité (FC6)
+- **TheMealDB & OpenFoodFacts** : Sources de données ouvertes, gratuites mais avec risques de disponibilité
+
+Chaque relation représente une dépendance ou contrainte qui impacte la réussite du projet.
+
+### 4.3 Fonctions de service
+
+#### Fonctions principales (FP)
+
+| Réf. | Fonction | Description | Critère |
+|------|----------|-------------|---------|
+| **FP1** | Rechercher plats | Permettre la recherche par ingrédient ou nom de plat | Résultats < 2s, APIs fiables |
+| **FP2** | Afficher nutrition | Montrer les valeurs nutritionnelles des aliments | Données complètes, format clair |
+| **FP3** | Créer plats personnalisés | Générer des plats à partir d'ingrédients via IA | Proposition pertinente si pas de match |
+
+#### Fonctions contraintes (FC)
+
+| Réf. | Fonction | Description | Critère |
+|------|----------|-------------|---------|
+| **FC1** | Intégrer APIs externes | Connecter TheMealDB et OpenFoodFacts | Gestion erreurs, cache |
+| **FC2** | Responsive design | Adapter à mobile/tablette/desktop | Mobile-first |
+| **FC3** | Authentification | Gestion comptes utilisateurs | Sécurisé, RGPD compliant |
+| **FC4** | Chatbot IA | Assistant conversationnel sur page plat | Réponses pertinentes |
+| **FC5** | Proposition IA | Suggestions quand pas de plat trouvé | Algorithme ML/IA |
+| **FC6** | Performance | Temps réponse < 2s, disponibilité 99% | Cache, optimisation |
+
+### 4.4 Matrice de flexibilité
+
+| Fonction | Niveau | Justification |
+|----------|--------|---------------|
+| FP1 — Recherche | **F0** (impératif) | Cœur de l'application |
+| FP2 — Nutrition | **F0** (impératif) | Valeur ajoutée principale |
+| FP3 — Création IA | **F1** (peu flexible) | Différenciateur clé |
+| FC1 — APIs | **F1** (peu flexible) | Dépendance externe |
+| FC2 — Responsive | **F0** (impératif) | Usage mobile majoritaire |
+| FC3 — Auth | **F2** (flexible) | Fonctionne sans compte |
+| FC4 — Chatbot | **F2** (flexible) | Fonctionnalité bonus |
+| FC5 — Proposition IA | **F1** (peu flexible) | Complexité technique |
+| FC6 — Performance | **F1** (peu flexible) | SLOs définis |
+
+### 4.5 Personas
+
+#### 🍳 Marie — La cuisinière passionnée
+
+| | |
+|---|---|
+| **Âge** | 35 ans |
+| **Profession** | Mère de famille |
+| **Lieu** | Paris |
+| **Devices** | Smartphone Android, tablette |
+| **Comportement** | Cuisine tous les jours, attentive à la nutrition familiale |
+
+**Objectifs**
+- Trouver des recettes équilibrées pour la famille
+- Vérifier les valeurs nutritionnelles des ingrédients
+- Créer des plats personnalisés avec ce qu'elle a au frigo
+
+**Frustrations**
+- Recettes trop complexes ou pas adaptées
+- Difficile d'estimer les calories totales
+- Perd du temps à chercher des alternatives
+
+**Citation** : *"Je veux savoir exactement ce que je cuisine pour ma famille."*
+
+#### 🏃‍♂️ Thomas — Le sportif healthy
+
+| | |
+|---|---|
+| **Âge** | 28 ans |
+| **Profession** | Coach sportif |
+| **Lieu** | Lyon |
+| **Devices** | iPhone, ordinateur portable |
+| **Comportement** | Suit un régime strict, cuisine ses repas |
+
+**Objectifs**
+- Calculer précisément les macros de ses repas
+- Découvrir de nouvelles recettes healthy
+- Utiliser le chatbot pour des conseils personnalisés
+
+**Frustrations**
+- Applications trop compliquées
+- Données nutritionnelles imprécises
+- Manque de personnalisation
+
+**Citation** : *"J'ai besoin d'un outil simple pour tracker ma nutrition."*
+
+#### 👨‍💼 Sophie — La working girl pressée
+
+| | |
+|---|---|
+| **Âge** | 42 ans |
+| **Profession** | Cadre commerciale |
+| **Lieu** | Bordeaux |
+| **Devices** | Smartphone iOS |
+| **Comportement** | Mange souvent dehors, veut des repas rapides healthy |
+
+**Objectifs**
+- Trouver des plats rapides à préparer
+- Vérifier la nutrition avant de commander
+- Utiliser l'IA pour des suggestions innovantes
+
+**Frustrations**
+- Pas le temps de cuisiner compliqué
+- Applications de livraison pas transparentes sur nutrition
+- Besoin de variété dans les repas
+
+**Citation** : *"Je veux manger healthy sans y passer des heures."*
+
+### 4.6 User Stories
+
+#### Épopée 1 : Recherche et découverte
+
+| ID | En tant que... | Je veux... | Afin de... | Priorité |
+|----|----------------|------------|------------|----------|
+| US-1.1 | Utilisateur | rechercher par ingrédient | trouver des plats avec ce que j'ai | **Must** |
+| US-1.2 | Utilisateur | rechercher par nom de plat | accéder directement à une recette | **Must** |
+| US-1.3 | Utilisateur | voir les valeurs nutritionnelles | faire des choix éclairés | **Must** |
+| US-1.4 | Utilisateur | filtrer par régime (vegan, etc.) | adapter aux restrictions alimentaires | **Should** |
+| US-1.5 | Utilisateur | trier par temps de préparation | choisir selon mon temps disponible | **Could** |
+
+#### Épopée 2 : Création personnalisée
+
+| ID | En tant que... | Je veux... | Afin de... | Priorité |
+|----|----------------|------------|------------|----------|
+| US-2.1 | Utilisateur | saisir mes ingrédients | créer un plat personnalisé | **Must** |
+| US-2.2 | Utilisateur | recevoir des propositions IA | découvrir de nouvelles combinaisons | **Must** |
+| US-2.3 | Utilisateur | voir la nutrition du plat créé | vérifier l'équilibre | **Should** |
+
+#### Épopée 3 : Interaction IA
+
+| ID | En tant que... | Je veux... | Afin de... | Priorité |
+|----|----------------|------------|------------|----------|
+| US-3.1 | Utilisateur | discuter avec le chatbot | obtenir des conseils culinaires | **Should** |
+| US-3.2 | Utilisateur | poser des questions sur la recette | comprendre les étapes | **Should** |
+| US-3.3 | Utilisateur | demander des variantes | adapter la recette | **Could** |
+
+#### Épopée 4 : Authentification et personnalisation
+
+| ID | En tant que... | Je veux... | Afin de... | Priorité |
+|----|----------------|------------|------------|----------|
+| US-4.1 | Utilisateur | créer un compte | sauvegarder mes préférences | **Should** |
+| US-4.2 | Utilisateur | me connecter avec Google | m'inscrire rapidement | **Should** |
+| US-4.3 | Utilisateur | changer de langue | utiliser l'app dans ma langue | **Could** |
+| US-4.4 | Utilisateur | sauvegarder des recettes | les retrouver facilement | **Should** |
+| US-4.5 | Utilisateur | voir mon historique | reprendre mes recherches | **Could** |
+
+#### Matrice de priorisation (MoSCoW)
+
+| Priorité | Signification | Nombre |
+|----------|---------------|--------|
+| **Must** | Indispensable au MVP | 6 |
+| **Should** | Important pour la v1 | 6 |
+| **Could** | Souhaitable si temps | 3 |
+| **Won't** | Hors scope actuel | 0 |
+
+---
+
+## 5. KPIs (Key Performance Indicators)
+
+### 5.1 KPIs Métier
+
+| KPI | Définition | Cible | Fréquence |
+|-----|------------|-------|-----------|
+| **Taux de conversion recherche** | % recherches aboutissant à consultation recette | > 40% | Quotidien |
+| **Temps moyen session** | Durée moyenne utilisateur sur l'app | > 5 min | Quotidien |
+| **Taux satisfaction** | Note moyenne utilisateur (1-5) | > 4.2 | Mensuel |
+| **Utilisation chatbot** | % sessions avec interaction chatbot | > 25% | Hebdomadaire |
+| **Proposition IA acceptée** | % propositions IA menant à création plat | > 30% | Quotidien |
+
+### 5.2 KPIs Technique
+
+| KPI | Définition | Cible | Fréquence |
+|-----|------------|-------|-----------|
+| **Disponibilité APIs** | % temps APIs externes opérationnelles | > 99% | Quotidien |
+| **Temps réponse recherche** | Latence moyenne recherche | < 1.5s | Temps réel |
+| **Taux erreur API** | % appels API en erreur | < 5% | Quotidien |
+| **Cache hit rate** | % requêtes servies par cache | > 60% | Quotidien |
+| **Taux disponibilité app** | % uptime application | > 99.5% | Quotidien |
+
+### 5.3 KPIs Produit
+
+| KPI | Définition | Cible | Fréquence |
+|-----|------------|-------|-----------|
+| **Couverture recettes** | Nombre recettes disponibles | > 2000 | Mensuel |
+| **Précision nutrition** | % données nutritionnelles complètes | > 85% | Mensuel |
+| **Engagement IA** | Nombre interactions IA/session | > 2.5 | Hebdomadaire |
+| **Retention utilisateurs** | % utilisateurs revenant à 7j | > 35% | Mensuel |
+| **Acquisition mobile** | % trafic depuis mobile | > 70% | Quotidien |
+
+---
+
+## 6. Choix architecturaux
+
+### 6.1 Monolithe vs Micro-services
+
+| | Monolithe (choisi) | Micro-services |
+|---|---|---|
+| **Complexité** | Faible (Symfony standard) | Élevée (orchestration) |
+| **Déploiement** | Simple (1 artefact) | Complexe (multi-conteneurs) |
+| **Performance** | Bonne pour charge modérée | Optimale pour scaling |
+| **Équipe** | 1-2 développeurs | Équipe plus large |
+
+**Justification** : L'application reste modeste en taille et trafic. Symfony fournit une architecture modulaire suffisante avec contrôleurs séparés.
+
+### 6.2 APIs externes : TheMealDB vs OpenFoodFacts
+
+| Critère | TheMealDB | OpenFoodFacts |
+|---------|-----------|---------------|
+| **Usage** | Recettes et plats | Données nutritionnelles |
+| **Licence** | Gratuit, commercial OK | Open Data (ODbL) |
+| **Fiabilité** | Bonne (hébergé communautaire) | Excellente (fondation) |
+| **Couverture** | ~300 plats | Millions de produits |
+| **Format** | JSON structuré | JSON flexible |
+
+**Justification** : Combinaison parfaite pour le besoin : recettes + nutrition.
+
+### 6.3 IA : Proposition et Chatbot
+
+| Option | Choix | Alternative |
+|--------|-------|-------------|
+| **Proposition IA** | Règles + ML simple | LLM externe (GPT) |
+| **Chatbot** | Bot conversationnel spécialisé | Intégration ChatGPT |
+
+**Justification** : Coûts maîtrisés, confidentialité des données utilisateur.
+
+### 6.4 Cache : Doctrine vs Redis
+
+| | Doctrine Cache (actuel) | Redis (prévu) |
+|---|---|---|
+| **Simplicité** | Intégré à Symfony | Configuration supplémentaire |
+| **Performance** | Suffisant pour trafic actuel | Optimale pour scaling |
+| **Coût** | Aucun | Infrastructure légère |
+| **Fonctionnalités** | Cache simple | Structures avancées, pub/sub |
+
+**Justification** : Doctrine pour MVP, Redis prévu pour améliorer performance et ajouter fonctionnalités avancées (sessions distribuées, cache multilingue).
+
+### 6.5 Internationalisation : Traducteur intégré
+
+| Option | Choix | Alternative |
+|--------|-------|-------------|
+| **Traducteur** | Google Translate API | Traductions manuelles |
+| **Cache** | Doctrine cache 24h | Pas de cache |
+
+**Justification** : Automatisation complète, support multilingue sans effort manuel.
+
+### 6.6 OAuth : Google vs autres
+
+| Option | Choix | Alternative |
+|--------|-------|-------------|
+| **Provider** | Google OAuth | Facebook, Apple |
+| **Bundle** | KnpUOAuth2Client | Implémentation custom |
+
+**Justification** : Popularité Google, bundle Symfony mature.
+
+---
+
+## 7. Architecture technique
+
+### 6.1 Vue globale
+
+```
+┌─────────────┐     ┌──────────────┐
+│  Frontend   │◄───▸│  Nginx       │
+│  Twig/JS    │     │  (Reverse    │
+│             │     │   Proxy)     │
+└─────────────┘     └──────┬───────┘
+                           │
+              ┌────────────┼────────────┐
+              ▼                         ▼
+   ┌────────────────────┐    ┌────────────────────┐
+   │   TheMealDB API    │    │ OpenFoodFacts API  │
+   │   (Recettes)       │    │   (Nutrition)      │
+   └────────────────────┘    └────────────────────┘
+              ▲                         ▲
+              │                         │
+   ┌──────────┼──────────┐    ┌─────────┼──────────┐
+   │  Doctrine Cache     │    │  Doctrine Cache   │
+   │  (1h TTL)           │    │  (24h TTL)        │
+   └─────────────────────┘    └─────────────────────┘
+              ▲                         ▲
+              │                         │
+   ┌──────────┴──────────┐    ┌─────────┴──────────┐
+   │   Redis (prévu)     │    │   Redis (prévu)   │
+   │   Cache avancé      │    │   Cache avancé    │
+   └─────────────────────┘    └─────────────────────┘
+              ▲                         ▲
+              │                         │
+   ┌──────────┴─────────────────────────┴──────────┐
+   │            PostgreSQL Database                │
+   │   Tables: users, favorites, search_history    │
+   └───────────────────────────────────────────────┘
+```
+
+**Conteneurisation Docker :**
+- Application Symfony dans conteneur PHP-FPM
+- Nginx comme reverse proxy et serveur statique
+- PostgreSQL et Redis dans conteneurs séparés
+- Docker Compose pour orchestration locale
+
+### 6.2 Stack technique
+
+| Couche | Technologies |
+|--------|-------------|
+| **Frontend** | Twig, CSS3, JavaScript (ES6+), Bootstrap |
+| **Backend** | Symfony 6.1, PHP 8.1, Nginx |
+| **Base de données** | PostgreSQL 15 |
+| **Cache** | Doctrine Cache (actuel), Redis (prévu) |
+| **Conteneurisation** | Docker, Docker Compose |
+| **APIs externes** | TheMealDB, OpenFoodFacts |
+
+---
+
+## 7. Pipeline de données
+
+### 7.1 Flux recherche
+
+```
+Requête utilisateur ──▸ Controller ──▸ Service ──▸ API externe ──▸ Cache ──▸ Base ──▸ Vue
+```
+
+### 7.2 Intégration APIs
+
+- **TheMealDB** : Recherche par nom/ingrédient, détails recette
+- **OpenFoodFacts** : Recherche par code-barres ou nom produit
+- **Matching** : Algorithme simple pour lier ingrédients recette ↔ produits nutrition
+
+### 7.3 Proposition IA
+
+- **Entrée** : Liste ingrédients utilisateur
+- **Traitement** : Règles métier + clustering ML
+- **Sortie** : Plat suggéré avec recette générée
+
+### 7.4 Chatbot
+
+- **Technologie** : Bot basé règles + NLP simple
+- **Contexte** : Recette actuelle
+- **Réponses** : Conseils cuisine, variantes, FAQ
+
+### 8. Authentification & sécurité
+
+#### 8.1 Authentification
+
+- **Méthodes disponibles** : 
+  - Locale : Email + mot de passe (bcrypt)
+  - OAuth : Google pour inscription/connexion rapide
+- **Symfony Security** : Sessions PHP sécurisées
+- **Connexion** : Standard avec remember me
+- **Liaison comptes** : Possibilité de lier compte Google à compte local existant
+
+#### 8.2 Google OAuth 2.0
+
+- **Flux** : Authorization Code avec PKCE
+- **Scénarios** :
+  1. Nouvel utilisateur Google → création automatique du compte
+  2. Email Google existant → liaison automatique
+- **Sécurité** : State parameter, PKCE pour protection
+- **Intégration** : Via KnpUOAuth2ClientBundle (Symfony)
+
+#### 8.3 Sécurité
+
+- **RGPD** : Consentement, droit oubli, minimisation données
+- **HTTPS** : Obligatoire en production
+- **Rate limiting** : Via firewall Symfony
+- **Validation** : Toutes entrées utilisateur validées
+
+---
+
+## 9. Internationalisation (i18n)
+
+### 9.1 Support multilingue
+
+- **Langues supportées** : Français (par défaut), Anglais, Espagnol
+- **Framework** : Symfony Translator
+- **Traducteur intégré** : Utilisation de Google Translate API pour traductions dynamiques
+- **Fichiers de traduction** : YAML/JSON pour textes statiques
+- **Contenu dynamique** : Traduction automatique des recettes et ingrédients via API
+
+### 9.2 Implémentation
+
+- **Détection langue** : Browser locale, paramètre URL, choix utilisateur
+- **Cache traductions** : Doctrine cache pour éviter appels répétés à Google Translate
+- **Fallback** : Affichage en anglais si traduction échoue
+- **Performance** : Traductions mises en cache 24h
+
+### 9.3 APIs et données
+
+- **TheMealDB** : Recettes en anglais, traduction vers langues cibles
+- **OpenFoodFacts** : Données multilingues natives, utilisation directe
+- **Chatbot IA** : Réponses traduites selon langue utilisateur
+
+---
+
+## 10. Application frontend
+
+### 9.1 Pages principales
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | HomePage | Recherche principale |
+| `/recipe/{id}` | RecipePage | Détails + chatbot |
+| `/create` | CreatePage | Saisie ingrédients + IA |
+| `/nutrition/{query}` | NutritionPage | Valeurs nutritionnelles |
+
+### 9.2 Responsive design
+
+- Mobile-first avec Bootstrap
+- Optimisé pour smartphones (320px+)
+- Progressive enhancement
+
+---
+
+## 10. Infrastructure & déploiement
+
+### 10.1 Conteneurisation
+
+- **Docker** : Image PHP + Nginx
+- **Docker Compose** : Dev environment
+- **Production** : Hébergement traditionnel (pas cloud requis)
+
+### 10.2 Monitoring
+
+- **Logs** : Monolog (Symfony)
+- **Métriques** : Manuel pour l'instant
+- **Alertes** : Email sur erreurs critiques
+
+---
+
+## 11. Observabilité
+
+### 11.1 Logs
+
+- Niveaux : DEBUG, INFO, WARNING, ERROR
+- Format : JSON structuré
+- Rotation : Quotidienne
+
+### 11.2 Métriques
+
+- Temps réponse APIs
+- Taux succès requêtes
+- Utilisation cache
+
+---
+
+## 12. Sécurité
+
+- **OWASP Top 10** : Protection XSS, CSRF, injection
+- **Mots de passe** : bcrypt cost 12
+- **Sessions** : Sécurisées, expiration
+- **APIs** : Rate limiting, validation
+
+---
+
+## 13. Performance
+
+### 13.1 Objectifs
+
+| Métrique | Cible |
+|----------|-------|
+| Temps réponse recherche | < 2s |
+| Disponibilité app | > 99% |
+| Cache hit rate | > 50% |
+
+### 13.2 Optimisations
+
+- Cache APIs externes
+- Requêtes parallèles quand possible
+- Lazy loading images
+
+---
+
+## 14. Conformité légale
+
+- **RGPD** : Respecté (voir section sécurité)
+- **Licences APIs** : Gratuites et compatibles
+- **Droits d'auteur** : Crédits aux APIs
+
+---
+
+## 15. Roadmap (mise à jour)
+
+### Implémenté
+
+- [x] Recherche basique plats
+- [x] Intégration TheMealDB
+- [x] Affichage recettes
+- [x] Intégration OpenFoodFacts basique
+- [x] Connexion Google OAuth
+- [x] Internationalisation avec traducteur Google
+
+### À venir
+
+- [ ] Authentification complète (locale)
+- [ ] Chatbot IA sur page recette
+- [ ] Proposition IA pour création plats
+- [ ] Implémentation Redis pour cache avancé
+- [ ] Tests automatisés
+- [ ] PWA (Progressive Web App)
+- [ ] API REST pour mobile
+- [ ] Dashboard admin
+- [ ] Analytics utilisateur
 
 ### Strengths (Forces)
 - ✅ **APIs gratuites et fiables** : TheMealDB et OpenFoodFacts offrent des données à jour
@@ -722,6 +1328,6 @@ GET    /admin/dashboard            → Dashboard admin
 
 **Document Version:** 1.0  
 **Date de création:** Février 2026  
-**Auteur:** Équipe Développement  
+**Auteur:** Junior GASSAM GASSAM et Judin MALIVERT
 **Dernière mise à jour:** 02/02/2026  
 **Statut:** ✅ Approuvé
