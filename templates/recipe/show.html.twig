@@ -52,7 +52,6 @@
                             <option value="en" selected>Anglais</option>
                             <option value="fr">Français</option>
                             <option value="es">Espagnol</option>
-                            <option value="it">Italien</option>
                             <option value="de">Allemand</option>
                         </select>
                     </div>
@@ -76,7 +75,7 @@
         </div>
     </div>
 
-    <script>
+    {#<script>
         const langSelector = document.getElementById('lang-selector');
         // Sauvegarde de l'original pour reset sans recharger la page
         const originalInstructions = document.getElementById('instructions-text').innerHTML;
@@ -121,6 +120,59 @@
             } catch (error) {
                 console.error("Erreur Traduction:", error);
                 alert("Erreur lors de la traduction. Réessayez plus tard.");
+            } finally {
+                instructionsEl.style.opacity = '1';
+            }
+        });
+    </script>#}
+
+    <script>
+        const langSelector = document.getElementById('lang-selector');
+        const originalInstructions = document.getElementById('instructions-text').innerHTML;
+        const originalIngredientNames = Array.from(document.querySelectorAll('.ingredient-name')).map(el => el.innerText);
+
+        langSelector.addEventListener('change', async (e) => {
+            const targetLang = e.target.value;
+            const instructionsEl = document.getElementById('instructions-text');
+            const ingredientEls = document.querySelectorAll('.ingredient-name');
+
+            if (targetLang === 'en') {
+                instructionsEl.innerHTML = originalInstructions;
+                ingredientEls.forEach((el, i) => el.innerText = originalIngredientNames[i]);
+                return;
+            }
+
+            instructionsEl.style.opacity = '0.3';
+
+            try {
+                // Utilisation d'un moteur de traduction alternatif (Google Translate Mirror sans clé)
+                // Cet endpoint accepte des textes longs sans la limite des 500 caractères
+                const translate = async (text, lang) => {
+                    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${lang}&dt=t&q=${encodeURIComponent(text)}`;
+                    const res = await fetch(url);
+                    const json = await res.json();
+                    // Google renvoie un tableau de segments, on les regroupe
+                    return json[0].map(item => item[0]).join('');
+                };
+
+                // 1. Traduire les instructions d'un seul bloc
+                const translatedInstructions = await translate(instructionsEl.innerText, targetLang);
+                instructionsEl.innerHTML = translatedInstructions.replace(/\n/g, '<br>');
+
+                // 2. Traduire les ingrédients (on les regroupe pour faire une seule requête au lieu de 20)
+                const allIngredients = originalIngredientNames.join(' | ');
+                const translatedIngredientsText = await translate(allIngredients, targetLang);
+                const translatedIngredientsArray = translatedIngredientsText.split(' | ');
+
+                ingredientEls.forEach((el, i) => {
+                    if (translatedIngredientsArray[i]) {
+                        el.innerText = translatedIngredientsArray[i].trim();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Erreur Traduction:", error);
+                // Si le miroir Google échoue, on peut mettre un message discret
             } finally {
                 instructionsEl.style.opacity = '1';
             }
