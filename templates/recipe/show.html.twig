@@ -1,5 +1,3 @@
-
-
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ meal.strMeal }} | Recette{% endblock %}
@@ -11,7 +9,6 @@
     </a>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-
         <div class="space-y-8">
             <div class="relative group overflow-hidden rounded-[2.5rem] shadow-2xl">
                 <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" class="w-full object-cover transition-transform duration-700 group-hover:scale-105">
@@ -31,7 +28,7 @@
                 <ul class="space-y-4">
                     {% for item in ingredients %}
                         <li class="flex justify-between items-center pb-3 border-b border-slate-50 dark:border-slate-800 last:border-0">
-                            <span class="text-slate-600 dark:text-slate-400 font-medium">{{ item.name }}</span>
+                            <span class="text-slate-600 dark:text-slate-400 font-medium ingredient-name">{{ item.name }}</span>
                             <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-indigo-600 dark:text-indigo-400">
                                 {{ item.measure }}
                             </span>
@@ -43,9 +40,22 @@
 
         <div class="lg:col-span-2 space-y-8">
             <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-8 md:p-12 border border-slate-100 dark:border-slate-800 shadow-sm">
-                <div class="mb-8">
-                    <span class="text-indigo-600 font-bold tracking-widest text-xs uppercase">{{ meal.strCategory }}</span>
-                    <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mt-2">{{ meal.strMeal }}</h1>
+                <div class="mb-8 flex flex-col md:flex-row justify-between items-start gap-4">
+                    <div>
+                        <span class="text-indigo-600 font-bold tracking-widest text-xs uppercase">{{ meal.strCategory }}</span>
+                        <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mt-2">{{ meal.strMeal }}</h1>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-2 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs font-bold px-2 text-slate-500">Traduire :</span>
+                        <select id="lang-selector" class="bg-transparent text-sm font-bold outline-none cursor-pointer text-indigo-600 dark:text-indigo-400">
+                            <option value="en" selected>Anglais</option>
+                            <option value="fr">Français</option>
+                            <option value="es">Espagnol</option>
+                            <option value="it">Italien</option>
+                            <option value="de">Allemand</option>
+                        </select>
+                    </div>
                 </div>
 
                 <h2 class="text-xl font-black mb-6 flex items-center gap-3">
@@ -53,28 +63,67 @@
                     Instructions
                 </h2>
 
-                <div class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed space-y-6">
+                <div id="instructions-text" class="prose dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 leading-relaxed space-y-6">
                     {{ meal.strInstructions|nl2br }}
                 </div>
+
                 <br><br>
 
                 <a href="{{ path('recipe_nutrition', {id: meal.idMeal}) }}" class="flex items-center justify-center gap-3 px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-emerald-600/20">
                     <span>📊</span> Voir l'Analyse & Assistant IA
                 </a>
-
-                {% if meal.strYoutube %}
-                    <div class="mt-12 pt-12 border-t border-slate-100 dark:border-slate-800">
-                        <h2 class="text-xl font-black mb-6 flex items-center gap-3">
-                            <span class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-lg">🎬</span>
-                            Tutoriel Vidéo
-                        </h2>
-                        <div class="aspect-video rounded-3xl overflow-hidden shadow-2xl">
-                            {% set videoId = meal.strYoutube|split('v=')|last %}
-                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/{{ videoId }}" frameborder="0" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>
+
+    <script>
+        const langSelector = document.getElementById('lang-selector');
+        // Sauvegarde de l'original pour reset sans recharger la page
+        const originalInstructions = document.getElementById('instructions-text').innerHTML;
+        const originalIngredientNames = Array.from(document.querySelectorAll('.ingredient-name')).map(el => el.innerText);
+
+        langSelector.addEventListener('change', async (e) => {
+            const targetLang = e.target.value;
+            const instructionsEl = document.getElementById('instructions-text');
+            const ingredientEls = document.querySelectorAll('.ingredient-name');
+
+            if (targetLang === 'en') {
+                instructionsEl.innerHTML = originalInstructions;
+                ingredientEls.forEach((el, i) => el.innerText = originalIngredientNames[i]);
+                return;
+            }
+
+            // UI: Feedback de chargement
+            instructionsEl.style.opacity = '0.3';
+            instructionsEl.style.transition = 'opacity 0.3s';
+
+            try {
+                // 1. Traduction des instructions par blocs (pour éviter la limite de caractères)
+                const fullText = instructionsEl.innerText;
+                // On découpe par paragraphes ou par points
+                const chunks = fullText.match(/.{1,450}(?=\s|$)/g) || [fullText];
+
+                const translatedChunks = await Promise.all(chunks.map(async (chunk) => {
+                    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk.trim())}&langpair=en|${targetLang}`);
+                    const json = await res.json();
+                    return json.responseData.translatedText;
+                }));
+
+                instructionsEl.innerHTML = translatedChunks.join(' ').replace(/\n/g, '<br>');
+
+                // 2. Traduction des ingrédients (généralement courts, donc pas besoin de chunking)
+                await Promise.all(Array.from(ingredientEls).map(async (el) => {
+                    const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(el.innerText)}&langpair=en|${targetLang}`);
+                    const json = await res.json();
+                    el.innerText = json.responseData.translatedText;
+                }));
+
+            } catch (error) {
+                console.error("Erreur Traduction:", error);
+                alert("Erreur lors de la traduction. Réessayez plus tard.");
+            } finally {
+                instructionsEl.style.opacity = '1';
+            }
+        });
+    </script>
 {% endblock %}

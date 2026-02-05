@@ -1,52 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion{% endblock %}
+{% block title %}Authentification | JuniorJudin{% endblock %}
 
 {% block body %}
 
     <style>
+        /* --- DYNAMICS & TRANSITIONS --- */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --google: #dd4b39;
+            --glass: rgba(255, 255, 255, 0.95);
+        }
 
-        /* --- PAGE BACKGROUND --- */
         .login-page {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #eef2f3, #dfe9f3);
+            background: radial-gradient(circle at top left, #4f46e5, #7c3aed);
             padding: 20px;
             font-family: 'Inter', sans-serif;
         }
 
-        /* --- CARD --- */
         .login-card {
-            background: #ffffff;
-            padding: 40px 35px;
-            border-radius: 18px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 45px 35px;
+            border-radius: 2rem;
             width: 100%;
-            max-width: 420px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            animation: fadeIn 0.4s ease;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.5s ease-out;
         }
 
-        /* Smooth fade-in animation */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- TITLES --- */
         .login-title {
-            font-size: 2rem;
-            font-weight: 700;
+            font-size: 2.2rem;
+            font-weight: 900;
             text-align: center;
-            margin-bottom: 5px;
+            color: #1e293b;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
         }
 
         .login-subtitle {
             text-align: center;
-            color: #666;
-            margin-bottom: 25px;
+            color: #64748b;
+            margin-bottom: 30px;
             font-size: 0.95rem;
+            font-weight: 500;
         }
 
         /* --- INPUTS --- */
@@ -57,145 +65,207 @@
         }
 
         .input-group label {
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             margin-bottom: 8px;
-            color: #333;
+            color: #64748b;
         }
 
         .input-group input {
-            padding: 12px 14px;
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            transition: 0.2s;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 2px solid #f1f5f9;
+            background: #f8fafc;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 1rem;
+            color: #1e293b;
         }
 
         .input-group input:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.15);
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
             outline: none;
         }
 
-        /* --- PRIMARY BUTTON --- */
+        /* --- BUTTONS --- */
         .btn-primary-modern {
             width: 100%;
-            padding: 14px;
-            background: #0d6efd;
+            padding: 16px;
+            background: var(--primary);
             color: white;
-            border-radius: 12px;
+            border-radius: 14px;
             border: none;
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
-            margin-top: 5px;
+            transition: 0.3s;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
         }
 
         .btn-primary-modern:hover {
-            background: #0b5ed7;
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 15px 20px -5px rgba(79, 70, 229, 0.4);
         }
 
-        /* --- ERROR MESSAGE --- */
-        .alert-error {
-            background: #ffe5e5;
-            padding: 12px;
-            border-radius: 10px;
-            color: #b60000;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
-        }
+        .btn-primary-modern:active { transform: translateY(0); }
 
-        /* --- SEPARATOR --- */
-        .separator {
-            text-align: center;
-            position: relative;
-            margin: 25px 0;
-        }
-
-        .separator::before,
-        .separator::after {
-            content: "";
-            height: 1px;
-            width: 40%;
-            background: #ddd;
-            position: absolute;
-            top: 50%;
-        }
-
-        .separator::before { left: 0; }
-        .separator::after { right: 0; }
-
-        .separator span {
-            font-size: 0.85rem;
-            color: #666;
-            padding: 0 10px;
-            background: white;
-        }
-
-        /* --- GOOGLE BUTTON --- */
         .btn-google {
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #dd4b39;
-            color: #dd4b39;
-            font-weight: 600;
+            padding: 14px;
+            border-radius: 14px;
+            border: 2px solid #f1f5f9;
+            background: white;
+            color: #1e293b;
+            font-weight: 700;
             text-decoration: none;
-            transition: 0.2s;
-            gap: 8px;
+            transition: 0.3s;
+            gap: 12px;
         }
 
         .btn-google:hover {
-            background: #dd4b39;
-            color: white;
+            background: #f8fafc;
+            border-color: #e2e8f0;
+            transform: translateY(-1px);
         }
 
+        .btn-google img { width: 20px; }
+
+        /* --- UI ELEMENTS --- */
+        .separator {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .separator::before, .separator::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .separator span { padding: 0 15px; }
+
+        .alert-error {
+            background: #fff1f2;
+            padding: 14px;
+            border-radius: 12px;
+            color: #e11d48;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+            border: 1px solid #fecdd3;
+            font-weight: 600;
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .toggle-link a {
+            color: var(--primary);
+            font-weight: 800;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .hidden { display: none; }
     </style>
 
     <div class="login-page">
 
         <div class="login-card">
 
-            <h2 class="login-title">Connexion</h2>
-            <p class="login-subtitle">Accédez à votre espace personnel</p>
+            <div id="login-section">
+                <h2 class="login-title">Bon retour !</h2>
+                <p class="login-subtitle">Connectez-vous à JuniorJudin'Board</p>
 
-            {% if error %}
-                <div class="alert-error">
-                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                {% if error %}
+                    <div class="alert-error">
+                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{{ path('app_login') }}">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="input-group">
+                        <label for="inputEmail">Email professionnel</label>
+                        <input type="email" id="inputEmail" name="email" value="{{ last_username }}" placeholder="nom@exemple.com" required autofocus>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="inputPassword">Mot de passe</label>
+                        <input type="password" id="inputPassword" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <button class="btn-primary-modern" type="submit">
+                        Se connecter
+                    </button>
+                </form>
+
+                <div class="toggle-link">
+                    Pas encore de compte ? <a onclick="toggleAuth()">Créez-en un</a>
                 </div>
-            {% endif %}
+            </div>
 
-            <form method="post">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+            <div id="register-section" class="hidden">
+                <h2 class="login-title">Bienvenue !</h2>
+                <p class="login-subtitle">Rejoignez notre communauté d'experts</p>
 
-                <div class="input-group">
-                    <label for="inputEmail">Email</label>
-                    <input type="email" id="inputEmail" name="email" value="{{ last_username }}" required>
+                <form method="post" action="{{ path('app_register') }}">
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="votre@email.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Mot de passe</label>
+                        <input type="password" name="password" placeholder="Minimum 8 caractères" required>
+                    </div>
+
+                    <button class="btn-primary-modern" type="submit" style="background: #059669;">
+                        Créer mon compte
+                    </button>
+                </form>
+
+                <div class="toggle-link">
+                    Déjà membre ? <a onclick="toggleAuth()">Connectez-vous</a>
                 </div>
-
-                <div class="input-group">
-                    <label for="inputPassword">Mot de passe</label>
-                    <input type="password" id="inputPassword" name="password" required>
-                </div>
-
-                <button class="btn-primary-modern" type="submit">
-                    Se connecter
-                </button>
-            </form>
+            </div>
 
             <div class="separator">
                 <span>OU</span>
             </div>
 
             <a href="{{ path('connect_google_start') }}" class="btn-google">
-                <i class="fab fa-google"></i> Se connecter avec Google
+                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google">
+                Continuer avec Google
             </a>
 
         </div>
 
     </div>
+
+    <script>
+        function toggleAuth() {
+            const login = document.getElementById('login-section');
+            const register = document.getElementById('register-section');
+
+            login.classList.toggle('hidden');
+            register.classList.toggle('hidden');
+        }
+    </script>
 
 {% endblock %}
