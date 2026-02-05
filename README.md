@@ -40,14 +40,56 @@ docker compose up -d --build
 
 ## ✨ Fonctionnalités
 
-- 🔍 **Recherche dynamique de plats** via TheMealDB API
-- 📊 **Informations nutritionnelles détaillées** via OpenFoodFacts API
-- 👤 **Système d'authentification utilisateur** (inscription/connexion)
-- ⭐ **Sauvegarde des favoris** (recettes préférées)
-- 📱 **Interface responsive** (mobile, tablet, desktop)
-- 🎨 **Design épuré et moderne** (Twig + Bootstrap)
-- 🔄 **Gestion des erreurs gracieuse** (API indisponible, pas de résultats)
-- 📝 **Documentation complète** (Cahier des charges, API docs)
+### 🔍 Recherche & Découverte
+- **Recherche dynamique de plats** via TheMealDB API (par nom ou ingrédient)
+- **Informations nutritionnelles détaillées** via OpenFoodFacts API
+- **Filtrage avancé** (catégorie, régime alimentaire, temps de préparation)
+- **Tri intelligent** (calories, popularité, temps de cuisson)
+
+### 🤖 Intelligence Artificielle
+- **Chatbot IA** sur les pages de recettes pour conseils personnalisés
+- **Proposition IA** : génération automatique de plats quand les APIs ne trouvent rien
+- **Suggestions intelligentes** basées sur vos ingrédients disponibles
+
+### 🌐 Internationalisation
+- **Support multilingue** : Français, Anglais, Espagnol
+- **Traduction automatique** via Google Translate API
+- **Interface adaptative** selon la langue utilisateur
+
+### 👤 Authentification Avancée
+- **Connexion locale** : Email + mot de passe (bcrypt sécurisé)
+- **OAuth Google** : Inscription/connexion rapide via Google
+- **Gestion de profil** : Historique, favoris, préférences
+- **RGPD compliant** : Consentement, droit à l'oubli
+
+### 🌐 Internationalisation
+- **Langues supportées** : Français (défaut), Anglais, Espagnol
+- **Traduction automatique** : Google Translate API pour contenu dynamique
+- **Cache des traductions** : 24h TTL pour optimiser les performances
+- **Détection automatique** : Basée sur les préférences navigateur
+
+### 🤖 Intelligence Artificielle
+- **Chatbot IA** : Assistant conversationnel sur pages recettes
+- **Proposition IA** : Génération de plats quand APIs ne trouvent rien
+- **Algorithmes** : Règles métier + clustering ML (scikit-learn)
+- **Contexte-aware** : Réponses adaptées à la recette consultée
+
+### 📊 KPIs & Analytics
+- **Métriques métier** : Taux conversion, satisfaction utilisateur, engagement IA
+- **Métriques techniques** : Disponibilité APIs, temps réponse, cache hit rate
+- **Dashboard admin** : Interface de monitoring temps réel
+- **Rapports automatisés** : Exports quotidiens/hebdomadaires
+
+### ⚡ Performance & Fiabilité
+- **Cache multi-niveau** : Doctrine (actuel) + Redis (prévu)
+- **Gestion d'erreurs gracieuse** (APIs indisponibles, timeouts)
+- **Monitoring intégré** (logs, métriques, alertes)
+- **Disponibilité 99.5%** avec infrastructure redondante
+
+### 📊 Analytics & KPIs
+- **Tableau de bord admin** avec métriques temps réel
+- **Tracking utilisateur** (sessions, conversions, satisfaction)
+- **Rapports automatisés** (quotidien/hebdomadaire/mensuel)
 
 ---
 
@@ -67,13 +109,17 @@ docker compose up -d --build
 
 ### DevOps
 - **Containerization:** Docker & Docker Compose
-- **Nginx:** 1.23 (Alpine)
+- **Reverse Proxy:** Nginx 1.23 (Alpine)
+- **Cache:** Redis (prévu pour sessions et données)
 - **Database Admin:** Adminer
 - **Mailer:** Mailpit (dev)
+- **Monitoring:** Prometheus + Grafana (prévu)
 
 ### APIs Externes
 - **TheMealDB:** https://www.themealdb.com/api/json/v1/1/
 - **OpenFoodFacts:** https://world.openfoodfacts.org/api/v0/
+- **Google Translate:** https://translation.googleapis.com/
+- **Google OAuth:** https://accounts.google.com/
 
 ---
 
@@ -150,11 +196,29 @@ docker compose up -d
 
 ### 🌐 Accès aux Services
 
-| Service | URL | Identifiants |
-|---------|-----|--------------|
-| **Application** | http://localhost:8080 | - |
-| **Adminer** | http://localhost:8081 | postgres / app / Junior(2004) |
-| **Mailpit** | http://localhost:8025 | - (si activé) |
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Application** | http://localhost:8080 | Interface principale |
+| **Adminer** | http://localhost:8081 | Gestion base de données |
+| **Mailpit** | http://localhost:8025 | Emails de développement |
+| **API Docs** | http://localhost:8080/api/docs | Documentation API |
+| **Admin Dashboard** | http://localhost:8080/admin | Métriques & KPIs |
+| **Chatbot Demo** | http://localhost:8080/recipe/1 | Test IA intégré |
+
+### 🔐 Authentification
+
+- **Connexion locale** : `/login` (email/mot de passe)
+- **OAuth Google** : Bouton "Se connecter avec Google"
+- **Inscription** : `/register` avec validation email
+- **Récupération** : `/forgot-password` (prévu)
+
+### 🎯 Pages Principales
+
+- **Accueil** (`/`) : Recherche de plats
+- **Détails Recette** (`/recipe/{id}`) : Infos + Chatbot IA
+- **Création IA** (`/create`) : Proposition de plats
+- **Profil** (`/profile`) : Favoris, historique
+- **Admin** (`/admin`) : Dashboard métriques
 
 ---
 
@@ -388,6 +452,55 @@ docker compose restart php
 
 ## 🏗️ Architecture
 
+### Vue d'ensemble
+
+```
+┌─────────────┐     ┌──────────────┐
+│  Frontend   │◄───▸│  Nginx       │
+│  Twig/JS    │     │  (Reverse    │
+│             │     │   Proxy)     │
+└─────────────┘     └──────┬───────┘
+                           │
+              ┌────────────┼────────────┐
+              ▼                         ▼
+   ┌────────────────────┐    ┌────────────────────┐
+   │   TheMealDB API    │    │ OpenFoodFacts API  │
+   │   (Recettes)       │    │   (Nutrition)      │
+   └────────────────────┘    └────────────────────┘
+              ▲                         ▲
+              │                         │
+   ┌──────────┼──────────┐    ┌─────────┼──────────┐
+   │  Doctrine Cache     │    │  Doctrine Cache   │
+   │  (1h TTL)           │    │  (24h TTL)        │
+   └─────────────────────┘    └─────────────────────┘
+              ▲                         ▲
+              │                         │
+   ┌──────────┴──────────┐    ┌─────────┴──────────┐
+   │   Redis (prévu)     │    │   Redis (prévu)   │
+   │   Cache avancé      │    │   Cache avancé    │
+   └─────────────────────┘    └─────────────────────┘
+              ▲                         ▲
+              │                         │
+   ┌──────────┴─────────────────────────┴──────────┐
+   │            PostgreSQL Database                │
+   │   Tables: users, favorites, search_history    │
+   └───────────────────────────────────────────────┘
+```
+
+### Conteneurisation Docker
+
+- **Application Symfony** dans conteneur PHP-FPM
+- **Nginx** comme reverse proxy et serveur statique
+- **PostgreSQL** et **Redis** dans conteneurs séparés
+- **Docker Compose** pour orchestration locale
+
+### Points d'intégration
+
+- **APIs externes** : TheMealDB, OpenFoodFacts, Google Translate, Google OAuth
+- **Cache multi-niveau** : Doctrine (filesystem/APCu) + Redis (prévu)
+- **Sessions distribuées** : Redis pour scalabilité horizontale
+- **Monitoring** : Logs structurés, métriques Prometheus
+
 ### Structure du Projet
 
 ```
@@ -607,7 +720,31 @@ Les contributions sont les bienvenues !
 
 ---
 
-## 📄 Licence
+## � KPIs & Métriques
+
+### Métriques Métier
+- **Taux de conversion recherche** : % recherches aboutissant à consultation recette (> 40%)
+- **Temps moyen session** : Durée moyenne utilisateur (> 5 min)
+- **Taux satisfaction** : Note moyenne utilisateur (> 4.2/5)
+- **Utilisation chatbot** : % sessions avec interaction IA (> 25%)
+- **Proposition IA acceptée** : % propositions menant à création plat (> 30%)
+
+### Métriques Techniques
+- **Disponibilité APIs** : % temps services externes opérationnels (> 99%)
+- **Temps réponse** : Latence moyenne recherche (< 1.5s)
+- **Cache hit rate** : % requêtes servies par cache (> 60%)
+- **Taux disponibilité app** : Uptime global (> 99.5%)
+
+### Métriques Produit
+- **Couverture recettes** : Nombre recettes disponibles (> 2000)
+- **Précision nutrition** : % données nutritionnelles complètes (> 85%)
+- **Engagement IA** : Interactions IA par session (> 2.5)
+- **Retention** : % utilisateurs revenant à 7j (> 35%)
+- **Acquisition mobile** : % trafic depuis mobile (> 70%)
+
+---
+
+## �📄 Licence
 
 Ce projet est sous licence [MIT](LICENSE).
 
