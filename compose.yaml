@@ -3,9 +3,9 @@ services:
     image: postgres:16-alpine
     container_name: create_your_food_db
     environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: 'Junior(2004)'
+      POSTGRES_DB: ${DB_NAME:-app}
+      POSTGRES_USER: ${DB_USER:-app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     volumes:
       - database_data:/var/lib/postgresql/data
     ports:

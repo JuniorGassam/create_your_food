@@ -497,11 +497,11 @@ THEN les résultats viennent du cache
                            │
 ┌──────────────────────────▼──────────────────────────┐
 │         Symfony 6.1 Framework                       │
-│  ┌──────────────────────────────────────────────┐  │
-│  │ Controllers: FoodController, SecurityCtrl    │  │
-│  │ Services: HTTP Client, Validators            │  │
-│  │ Routes: /foods, /security/login              │  │
-│  └──────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────┐   │
+│  │ Controllers: FoodController, SecurityCtrl    │   │
+│  │ Services: HTTP Client, Validators            │   │
+│  │ Routes: /foods, /security/login              │   │
+│  └──────────────────────────────────────────────┘   │
 └──────────────────────────┬──────────────────────────┘
                            │
         ┌──────────────────┼──────────────────┐
@@ -512,9 +512,9 @@ THEN les résultats viennent du cache
    │           │  │               │  │               │
    └────┬──────┘  └────────┬──────┘  └──────┬────────┘
         │                  │                  │
-   ┌────▼──────────────────▼──────────────────▼────┐
-   │   Base de Données PostgreSQL / MySQL          │
-   │   Tables: users, favorites, search_cache      │
+   ┌────▼──────────────────▼──────────────────▼─────┐
+   │   Base de Données PostgreSQL                   │
+   │   Tables: users, favorites, search_cache       │
    └────────────────────────────────────────────────┘
         │
         └──────────────────────────────────┐
@@ -525,7 +525,7 @@ THEN les résultats viennent du cache
           │  │  TheMealDB   │  │ OpenFoodFacts    │  │
           │  │  API v1.1    │  │ API v0           │  │
           │  └──────────────┘  └──────────────────┘  │
-          └─────────────────────────────────────────┘
+          └──────────────────────────────────────────┘
 ```
 
 ### 10.2 Points d'Intégration API
