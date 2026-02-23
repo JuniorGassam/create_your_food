@@ -12,12 +12,14 @@
 ## 2. Description du Projet
 
 ### 2.1 Vision Générale
+
 Create Your Food est une application web innovante qui facilite la recherche de recettes et l'accès aux informations nutritionnelles détaillées. L'application s'appuie sur deux APIs externes :
 
 - **TheMealDB** : Base de données de plats et recettes mondiaux
 - **OpenFoodFacts** : Base de données sur les informations nutritionnelles des produits alimentaires
 
 ### 2.2 Objectifs Principaux
+
 1. Permettre aux utilisateurs de rechercher des plats par ingrédient ou nom
 2. Afficher les résultats de recherche avec détails des recettes
 3. Fournir les informations nutritionnelles associées aux produits
@@ -29,6 +31,7 @@ Create Your Food est une application web innovante qui facilite la recherche de 
 ## 3. Analyse SWOT
 
 **Forces (interne)**
+
 - APIs gratuites et riches (TheMealDB: 1000+ recettes, OpenFoodFacts: millions de produits)
 - Framework Symfony mature et sécurisé
 - Combinaison unique recherche plats + nutrition
@@ -36,6 +39,7 @@ Create Your Food est une application web innovante qui facilite la recherche de 
 - Proposition IA innovante pour création de plats
 
 **Faiblesses (interne)**
+
 - Dépendance à APIs externes (risque indisponibilité)
 - Données nutritionnelles parfois incomplètes
 - Pas de vérification des données (crowdsourced)
@@ -43,6 +47,7 @@ Create Your Food est une application web innovante qui facilite la recherche de 
 - Cache limité (pas de Redis actuellement)
 
 **Opportunités (externe)**
+
 - Croissance du marché healthy eating
 - Intégration avec apps fitness (MyFitnessPal, etc.)
 - Expansion internationale (APIs multilingues)
@@ -50,6 +55,7 @@ Create Your Food est une application web innovante qui facilite la recherche de 
 - Partenariats avec marques alimentaires
 
 **Menaces (externe)**
+
 - Concurrence d'apps établies (Yummly, Allrecipes)
 - Changements dans les APIs externes
 - Réglementation RGPD stricte
@@ -126,6 +132,7 @@ Create Your Food est une application web innovante qui facilite la recherche de 
 ```
 
 **Analyse du Diagramme Pieuvre :**
+
 - **Utilisateur web/mobile** : Point d'entrée principal, utilise l'app via navigateur ou mobile (FP1, FP2, FP3)
 - **APIs externes** : Dépendance critique pour les données (FC1), source de recettes et nutrition
 - **Appareil mobile** : Contraintes techniques pour responsive design et capteurs (FC2)
@@ -185,11 +192,13 @@ Chaque relation représente une dépendance ou contrainte qui impacte la réussi
 | **Comportement** | Cuisine tous les jours, attentive à la nutrition familiale |
 
 **Objectifs**
+
 - Trouver des recettes équilibrées pour la famille
 - Vérifier les valeurs nutritionnelles des ingrédients
 - Créer des plats personnalisés avec ce qu'elle a au frigo
 
 **Frustrations**
+
 - Recettes trop complexes ou pas adaptées
 - Difficile d'estimer les calories totales
 - Perd du temps à chercher des alternatives
@@ -207,11 +216,13 @@ Chaque relation représente une dépendance ou contrainte qui impacte la réussi
 | **Comportement** | Suit un régime strict, cuisine ses repas |
 
 **Objectifs**
+
 - Calculer précisément les macros de ses repas
 - Découvrir de nouvelles recettes healthy
 - Utiliser le chatbot pour des conseils personnalisés
 
 **Frustrations**
+
 - Applications trop compliquées
 - Données nutritionnelles imprécises
 - Manque de personnalisation
@@ -229,11 +240,13 @@ Chaque relation représente une dépendance ou contrainte qui impacte la réussi
 | **Comportement** | Mange souvent dehors, veut des repas rapides healthy |
 
 **Objectifs**
+
 - Trouver des plats rapides à préparer
 - Vérifier la nutrition avant de commander
 - Utiliser l'IA pour des suggestions innovantes
 
 **Frustrations**
+
 - Pas le temps de cuisiner compliqué
 - Applications de livraison pas transparentes sur nutrition
 - Besoin de variété dans les repas
@@ -426,6 +439,7 @@ Chaque relation représente une dépendance ou contrainte qui impacte la réussi
 ```
 
 **Conteneurisation Docker :**
+
 - Application Symfony dans conteneur PHP-FPM
 - Nginx comme reverse proxy et serveur statique
 - PostgreSQL et Redis dans conteneurs séparés
@@ -474,7 +488,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 
 #### 8.1 Authentification
 
-- **Méthodes disponibles** : 
+- **Méthodes disponibles** :
   - Locale : Email + mot de passe (bcrypt)
   - OAuth : Google pour inscription/connexion rapide
 - **Symfony Security** : Sessions PHP sécurisées
@@ -634,6 +648,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 - [ ] Analytics utilisateur
 
 ### Strengths (Forces)
+
 - ✅ **APIs gratuites et fiables** : TheMealDB et OpenFoodFacts offrent des données à jour
 - ✅ **Base de données riche** : Accès à des milliers de plats et produits
 - ✅ **Technologie moderne** : Framework Symfony 6.1 performant
@@ -641,6 +656,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 - ✅ **Cas d'usage pertinent** : Adresse un besoin réel (recherche nutritionnelle + recettes)
 
 ### Weaknesses (Faiblesses)
+
 - ❌ **Dépendance à des services tiers** : Indisponibilité des APIs = dysfonctionnement de l'app
 - ❌ **Données fragmentées** : Les deux APIs ne sont pas liées, matching manuel requis
 - ❌ **Performance potentielle** : Appels API multiples par requête utilisateur
@@ -648,6 +664,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 - ❌ **Pas de système de cache** : Requêtes répétées sans optimisation
 
 ### Opportunities (Opportunités)
+
 - 🎯 **Expansion mobile** : Développer une application mobile (iOS/Android)
 - 🎯 **Recommandations personnalisées** : Système de recommandations basé sur l'historique
 - 🎯 **Intégration santé** : Lier à des applications de suivi de santé/fitness
@@ -656,6 +673,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 - 🎯 **Internationalisation** : Support multilingue et adaptations régionales
 
 ### Threats (Menaces)
+
 - ⚠️ **Concurrence** : MyFitnessPal, Yazio, Cronometer existants
 - ⚠️ **Changements d'APIs** : Modifications ou suppression des endpoints
 - ⚠️ **Conformité légale** : RGPD, licences de données
@@ -694,6 +712,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 ```
 
 ### Analyse de la Bête à Corne
+
 - **Qui ?** Utilisateur recherchant des recettes et informations nutritionnelles
 - **Quoi ?** Plateforme d'intégration de données culinaires et nutritionnelles
 - **Où ?** Interface web accessible via navigateur
@@ -753,6 +772,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 ## 6. User Stories et Cas d'Utilisation
 
 ### 6.1 Acteurs Principaux
+
 - 👤 **Utilisateur Non Authentifié** : Peut consulter
 - 👤 **Utilisateur Authentifié** : Accès complet + sauvegarde
 - 🔧 **Administrateur** : Gestion du système
@@ -763,6 +783,7 @@ Requête utilisateur ──▸ Controller ──▸ Service ──▸ API extern
 ### 6.2 User Stories
 
 #### US1 : Recherche Simple de Plats
+
 ```
 EN TANT QUE utilisateur
 JE VEUX rechercher des plats par nom ou ingrédient
@@ -782,6 +803,7 @@ THEN il voit les plats contenant "chicken"
 ```
 
 #### US2 : Consulter les Informations Nutritionnelles
+
 ```
 EN TANT QUE utilisateur
 JE VEUX voir les informations nutritionnelles des produits
@@ -801,6 +823,7 @@ THEN je vois au minimum les calories et macronutriments
 ```
 
 #### US3 : Voir les Détails d'une Recette
+
 ```
 EN TANT QUE utilisateur
 JE VEUX consulter les détails complets d'une recette
@@ -820,6 +843,7 @@ THEN je vois tous les détails (ingrédients, étapes, temps)
 ```
 
 #### US4 : Authentification Utilisateur
+
 ```
 EN TANT QUE utilisateur
 JE VEUX créer un compte et me connecter
@@ -839,6 +863,7 @@ THEN je suis connecté et accède à mes favoris
 ```
 
 #### US5 : Sauvegarder les Favoris
+
 ```
 EN TANT QUE utilisateur authentifié
 JE VEUX sauvegarder mes recettes préférées
@@ -858,6 +883,7 @@ THEN la recette est sauvegardée et confirmée
 ```
 
 #### US6 : Gestion des Erreurs API
+
 ```
 EN TANT QUE utilisateur
 JE VEUX voir des messages d'erreur clairs
@@ -877,6 +903,7 @@ THEN je vois "Service indisponible, réessayez plus tard"
 ```
 
 #### US7 : Filtrage et Tri des Résultats
+
 ```
 EN TANT QUE utilisateur
 JE VEUX filtrer et trier les résultats de recherche
@@ -896,6 +923,7 @@ THEN seules les recettes vegan s'affichent, triées par calories
 ```
 
 #### US8 : Performance et Cache
+
 ```
 EN TANT QUE développeur
 JE VEUX que les requêtes soient optimisées
@@ -966,6 +994,7 @@ THEN les résultats viennent du cache
 **Préconditions:** L'utilisateur est sur la page d'accueil
 
 **Scénario Nominal:**
+
 1. L'utilisateur entre un terme de recherche (ex: "chicken")
 2. Il clique sur "Rechercher" ou appuie sur Entrée
 3. L'application valide le terme
@@ -975,6 +1004,7 @@ THEN les résultats viennent du cache
 7. L'utilisateur peut cliquer sur un résultat pour plus de détails
 
 **Scénarios Alternatifs:**
+
 - **A1** : Si le terme contient des caractères invalides → message d'erreur
 - **A2** : Si TheMealDB ne répond pas → afficher "Service indisponible"
 - **A3** : Si aucun résultat n'existe → "Aucun plat trouvé"
@@ -989,6 +1019,7 @@ THEN les résultats viennent du cache
 **Préconditions:** L'utilisateur a effectué une recherche et vu les résultats
 
 **Scénario Nominal:**
+
 1. L'utilisateur clique sur une recette dans les résultats
 2. L'application récupère les détails complets de TheMealDB
 3. L'application récupère les informations nutritionnelles (si applicable)
@@ -1001,6 +1032,7 @@ THEN les résultats viennent du cache
 5. L'utilisateur peut retourner à la recherche
 
 **Scénarios Alternatifs:**
+
 - **A1** : Si les données nutritionnelles ne sont pas disponibles → afficher "Non disponible"
 - **A2** : Si l'une des API échoue → afficher les données disponibles
 
@@ -1062,16 +1094,19 @@ THEN les résultats viennent du cache
 ## 9. Exigences Non-Fonctionnelles
 
 ### 9.1 Performance
+
 - Temps de réponse initial : < 1 seconde
 - Recherche complète : < 2 secondes
 - Affichage des détails : < 1.5 secondes
 
 ### 9.2 Disponibilité
+
 - Disponibilité minimale : 99% (sauf maintenance)
 - Temps de maintenance : maintenu en heures creuses
 - Basculement automatique si une API externe échoue
 
 ### 9.3 Sécurité
+
 - Authentification par JWT ou session sécurisée
 - Chiffrement des mots de passe (bcrypt)
 - Protection CSRF
@@ -1079,12 +1114,14 @@ THEN les résultats viennent du cache
 - Rate limiting sur les recherches (10 req/minute)
 
 ### 9.4 Scalabilité
+
 - Architecture microservices possible
 - Base de données relational (Doctrine)
 - Cache Redis envisagé
 - Support de 1000 utilisateurs simultanés
 
 ### 9.5 Compatibilité
+
 - Navigateurs : Chrome, Firefox, Safari, Edge (versions récentes)
 - Résolutions : Desktop (1024px+), Tablet (768px+), Mobile (320px+)
 - Accessibilité : WCAG 2.1 AA
@@ -1137,6 +1174,7 @@ THEN les résultats viennent du cache
 ### 10.2 Points d'Intégration API
 
 #### API TheMealDB
+
 ```
 GET https://www.themealdb.com/api/json/v1/1/search.php?s={query}
 
@@ -1157,6 +1195,7 @@ Réponse:
 ```
 
 #### API OpenFoodFacts
+
 ```
 GET https://world.openfoodfacts.org/api/v0/product/{barcode}.json
 
@@ -1181,6 +1220,7 @@ Réponse:
 ## 11. Contexte Réglementaire et Légal
 
 ### 11.1 RGPD (Règlement Général sur la Protection des Données)
+
 - ✓ Politique de confidentialité claire
 - ✓ Consentement explicite pour collecte de données
 - ✓ Droit d'accès, rectification, suppression
@@ -1188,10 +1228,12 @@ Réponse:
 - ✓ Durée de rétention définie (12 mois max)
 
 ### 11.2 Licences des APIs
+
 - **TheMealDB** : Gratuit, usage commercial autorisé
 - **OpenFoodFacts** : Open Data (ODbL), crédits requis
 
 ### 11.3 Accessibilité
+
 - Conformité WCAG 2.1 AA
 - Textes alt pour images
 - Navigation au clavier
@@ -1202,6 +1244,7 @@ Réponse:
 ## 12. Planification et Chronologie
 
 ### Phase 1 : MVP (2 semaines)
+
 - [x] Setup Symfony + APIs
 - [x] Recherche basique
 - [x] Affichage des résultats
@@ -1209,21 +1252,25 @@ Réponse:
 - [ ] Informations nutritionnelles basiques
 
 ### Phase 2 : Authentification (1 semaine)
+
 - [ ] Inscription/Connexion
 - [ ] Gestion de sessions
 - [ ] Profil utilisateur
 
 ### Phase 3 : Favoris et Historique (1 semaine)
+
 - [ ] Système de favoris
 - [ ] Historique de recherche
 - [ ] Partage de recettes
 
 ### Phase 4 : Optimisation (1 semaine)
+
 - [ ] Cache et performance
 - [ ] Tests unitaires
 - [ ] Documentation API
 
 ### Phase 5 : Déploiement (1 semaine)
+
 - [ ] Configuration Docker
 - [ ] Tests d'intégration
 - [ ] Déploiement production
@@ -1233,21 +1280,25 @@ Réponse:
 ## 13. Critères de Succès
 
 ✅ **Fonctionnels**
+
 - 95% des recherches retournent des résultats valides
 - 99% des appels API réussissent ou sont gérés gracieusement
 - Toutes les user stories du MVP sont implémentées
 
 ✅ **Performance**
+
 - 90% des requêtes < 1.5 secondes
 - Temps de chargement initial < 3 secondes
 - Cache réduit les requêtes dupliquées de 80%
 
 ✅ **Utilisateur**
+
 - Score de satisfaction > 4/5
 - Taux de rebond < 20%
 - Session moyenne > 5 minutes
 
 ✅ **Technique**
+
 - Couverture de tests > 70%
 - Aucune erreur critique en production
 - Disponibilité > 99%
@@ -1288,6 +1339,7 @@ Réponse:
 ### Annexe A : Mockups Interface
 
 **Page de Recherche:**
+
 ```
 ┌──────────────────────────────────────────┐
 │  Create Your Food          [Login]       │

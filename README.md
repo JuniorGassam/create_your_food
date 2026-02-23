@@ -23,12 +23,14 @@ Une plateforme web innovante permettant de **rechercher des recettes** et **cons
 ## 🚀 Quick Start
 
 ### Windows (Recommandé)
+
 ```batch
 # Double-clique sur dev.bat ou
 dev.bat
 ```
 
 ### macOS / Linux
+
 ```bash
 git pull origin develop
 docker compose up -d --build
@@ -41,52 +43,61 @@ docker compose up -d --build
 ## ✨ Fonctionnalités
 
 ### 🔍 Recherche & Découverte
+
 - **Recherche dynamique de plats** via TheMealDB API (par nom ou ingrédient)
 - **Informations nutritionnelles détaillées** via OpenFoodFacts API
 - **Filtrage avancé** (catégorie, régime alimentaire, temps de préparation)
 - **Tri intelligent** (calories, popularité, temps de cuisson)
 
 ### 🤖 Intelligence Artificielle
+
 - **Chatbot IA** sur les pages de recettes pour conseils personnalisés
 - **Proposition IA** : génération automatique de plats quand les APIs ne trouvent rien
 - **Suggestions intelligentes** basées sur vos ingrédients disponibles
 
 ### 🌐 Internationalisation
+
 - **Support multilingue** : Français, Anglais, Espagnol
 - **Traduction automatique** via Google Translate API
 - **Interface adaptative** selon la langue utilisateur
 
 ### 👤 Authentification Avancée
+
 - **Connexion locale** : Email + mot de passe (bcrypt sécurisé)
 - **OAuth Google** : Inscription/connexion rapide via Google
 - **Gestion de profil** : Historique, favoris, préférences
 - **RGPD compliant** : Consentement, droit à l'oubli
 
 ### 🌐 Internationalisation
+
 - **Langues supportées** : Français (défaut), Anglais, Espagnol
 - **Traduction automatique** : Google Translate API pour contenu dynamique
 - **Cache des traductions** : 24h TTL pour optimiser les performances
 - **Détection automatique** : Basée sur les préférences navigateur
 
 ### 🤖 Intelligence Artificielle
+
 - **Chatbot IA** : Assistant conversationnel sur pages recettes
 - **Proposition IA** : Génération de plats quand APIs ne trouvent rien
 - **Algorithmes** : Règles métier + clustering ML (scikit-learn)
 - **Contexte-aware** : Réponses adaptées à la recette consultée
 
 ### 📊 KPIs & Analytics
+
 - **Métriques métier** : Taux conversion, satisfaction utilisateur, engagement IA
 - **Métriques techniques** : Disponibilité APIs, temps réponse, cache hit rate
 - **Dashboard admin** : Interface de monitoring temps réel
 - **Rapports automatisés** : Exports quotidiens/hebdomadaires
 
 ### ⚡ Performance & Fiabilité
+
 - **Cache multi-niveau** : Doctrine (actuel) + Redis (prévu)
 - **Gestion d'erreurs gracieuse** (APIs indisponibles, timeouts)
 - **Monitoring intégré** (logs, métriques, alertes)
 - **Disponibilité 99.5%** avec infrastructure redondante
 
 ### 📊 Analytics & KPIs
+
 - **Tableau de bord admin** avec métriques temps réel
 - **Tracking utilisateur** (sessions, conversions, satisfaction)
 - **Rapports automatisés** (quotidien/hebdomadaire/mensuel)
@@ -96,6 +107,7 @@ docker compose up -d --build
 ## 🛠️ Stack Technique
 
 ### Backend
+
 - **Framework:** Symfony 6.1
 - **PHP:** 8.1+
 - **Base de données:** PostgreSQL 16 (Docker) / MySQL (local)
@@ -103,11 +115,13 @@ docker compose up -d --build
 - **HTTP Client:** Symfony HttpClient
 
 ### Frontend
+
 - **Template Engine:** Twig
 - **CSS Framework:** Bootstrap 5
 - **JavaScript:** Vanilla JS + AJAX
 
 ### DevOps
+
 - **Containerization:** Docker & Docker Compose
 - **Reverse Proxy:** Nginx 1.23 (Alpine)
 - **Cache:** Redis (prévu pour sessions et données)
@@ -116,6 +130,7 @@ docker compose up -d --build
 - **Monitoring:** Prometheus + Grafana (prévu)
 
 ### APIs Externes
+
 - **TheMealDB:** https://www.themealdb.com/api/json/v1/1/
 - **OpenFoodFacts:** https://world.openfoodfacts.org/api/v0/
 - **Google Translate:** https://translation.googleapis.com/
@@ -126,10 +141,12 @@ docker compose up -d --build
 ## 📦 Prérequis
 
 ### Option 1: Avec Docker (Recommandé)
+
 - **Docker Desktop** v4.0+ 
 - **Git**
 
 ### Option 2: En Local
+
 - **PHP** 8.1+ avec extensions: `ctype`, `iconv`, `pdo_pgsql` (ou `pdo_mysql`)
 - **PostgreSQL** 16 (ou MySQL 8.0)
 - **Composer** 2.0+
@@ -227,6 +244,7 @@ docker compose up -d
 Les **git hooks pré-commit** lancent automatiquement l'analyse et la correction du code avant chaque commit. ✨
 
 ### Configuration Automatique
+
 Les hooks sont installés automatiquement lors de `composer install`. Si tu les as manqués :
 
 ```bash
@@ -240,6 +258,7 @@ setup-hooks.bat
 ### Fonctionnalités
 
 **À chaque `git commit` :**
+
 1. 🔧 **PHP-CS-Fixer** → Corrige automatiquement le code (indentation, espaces, imports, etc.)
 2. 🔬 **PHPStan** → Analyse statique pour détecter les erreurs
 3. ✅ Commit bloqué si erreurs détectées
@@ -258,11 +277,13 @@ git commit --no-verify
 ```
 
 ### Configuration PHPStan
+
 - **Fichier:** `phpstan.neon`
 - **Niveau:** 5 (max = 9)
 - **Paths:** `src/` seulement
 
 ### Configuration PHP-CS-Fixer
+
 - **Fichier:** `.php-cs-fixer.php`
 - **Rules:** @Symfony + custom
 
@@ -390,13 +411,16 @@ Xdebug est **déjà configuré** dans le Dockerfile. Aucune installation supplé
 ### Debugger du Code PHP dans VS Code
 
 #### 1️⃣ Installer l'extension PHP Debug
+
 ```
 Nom: PHP Debug
 ID: felixbecker.php-debug
 ```
 
 #### 2️⃣ Configuration (déjà faite)
+
 Le fichier `.vscode/launch.json` est pré-configuré pour :
+
 - **Host:** localhost
 - **Port:** 9003
 - **Path Mapping:** `/var/www/html` → Votre dossier local
@@ -424,11 +448,13 @@ public function index()
 **Méthode 2: Accepter les requêtes debug**
 
 Ajouter `?XDEBUG_SESSION_START=1` à l'URL :
+
 ```
 http://localhost:8080/foods?XDEBUG_SESSION_START=1
 ```
 
 #### 4️⃣ Fonctionnalités du Debugger
+
 - ⏸️ **Pause:** Cliquer sur "Pause" pour interrompre l'exécution
 - **Variables:** Voir les valeurs locales, globales, etc.
 - **Watch:** Surveiller des variables spécifiques
@@ -561,10 +587,10 @@ create_your_food/
         ┌──────────┼──────────┐
         │          │          │
         ▼          ▼          ▼
-   ┌────────┐ ┌────────┐ ┌──────────┐
-   │ Local  │ │ Cache  │ │ External │
-   │  DB    │ │ (Redis)│ │   APIs   │
-   └────────┘ └────────┘ │ ┌──────┐ │
+   ┌────────┐ ┌────────┐  ┌──────────┐
+   │ Local  │ │ Cache  │  │ External │
+   │  DB    │ │ (Redis)│  │   APIs   │
+   └────────┘ └────────┘  │ ┌──────┐ │
                           │ │Meal  │ │
                           │ │DB    │ │
                           │ └──────┘ │
@@ -723,6 +749,7 @@ Les contributions sont les bienvenues !
 ## � KPIs & Métriques
 
 ### Métriques Métier
+
 - **Taux de conversion recherche** : % recherches aboutissant à consultation recette (> 40%)
 - **Temps moyen session** : Durée moyenne utilisateur (> 5 min)
 - **Taux satisfaction** : Note moyenne utilisateur (> 4.2/5)
@@ -730,12 +757,14 @@ Les contributions sont les bienvenues !
 - **Proposition IA acceptée** : % propositions menant à création plat (> 30%)
 
 ### Métriques Techniques
+
 - **Disponibilité APIs** : % temps services externes opérationnels (> 99%)
 - **Temps réponse** : Latence moyenne recherche (< 1.5s)
 - **Cache hit rate** : % requêtes servies par cache (> 60%)
 - **Taux disponibilité app** : Uptime global (> 99.5%)
 
 ### Métriques Produit
+
 - **Couverture recettes** : Nombre recettes disponibles (> 2000)
 - **Précision nutrition** : % données nutritionnelles complètes (> 85%)
 - **Engagement IA** : Interactions IA par session (> 2.5)
@@ -763,6 +792,7 @@ Pour toute question ou problème:
 ## 📝 Changelog
 
 ### v1.0.0 (Février 2026)
+
 - ✅ Recherche de plats (TheMealDB)
 - ✅ Informations nutritionnelles (OpenFoodFacts)
 - ✅ Interface de base
