@@ -4,7 +4,7 @@
 
 **Nom du projet:** Create Your Food  
 **Equipe:** Junior GASSSAM GASSAM et Judin MALIVERT  
-**Type:** Application web intégrant 2 APIs externes  
+**Type:** Application web intégrant des APIs externes  
 **Objectif:** Fournir une plateforme permettant aux utilisateurs de rechercher des plats et consultants leurs informations nutritionnelles
 
 ---
